@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from Demo1.MySQL_EXEC_TYC.Functions import *
 
 """
-    方法类
+    天眼查爬虫方法类
 """
 class TYCSpiderFunctions():
     __antiRobot_retries = 3     #被反爬虫挡住的最大重试次数
@@ -164,10 +164,67 @@ class TYCSpiderFunctions():
             for item in a_list:
                 if 'https://www.tianyancha.com/company/' in str(item.get("href")):
                     if len(str(item.get("href"))) > 36:
-                        insert_company(str(item.get("href")))
-                        company_href_list.append(str(item.get("href")))
+                        company_href = str(item.get("href"))
+                        print('\t公司链接：', company_href)
+                        insert_company(company_href)
+                        company_href_list.append(company_href)
         print("此页一共爬取公司数: ", len(company_href_list))
 
-    def get_info(self, url, count):
+    """
+        @brief 获取企业详细信息
+    """
+    def get_info(self, url, count, useProxy = False):
+        if count > self.__antiRobot_retries:
+            print("重试超过%d次：建议停机检查：" % self.__antiRobot_retries, url)
+            return
+
+        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc)
+
+        html = self.__html_fetcher.get_html(url = url,
+                                            count = 1,
+                                            useProxy = useProxy)
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+
+    """
+        @brief 进入企业信息页，获取LOGO Img
+        此项非必须爬取到，因为有些公司没有logo
+    """
+    def __get_info_logoImg(self, soup, url):
+        # 企业logo
+        logdiv = soup.find('div', class_="logo -w100")
+        imgsrc = ""
+        if logdiv is not None:
+            img = logdiv.find('img', class_="img")
+            if img is not None:
+                imgsrc = img.get('data-src')
+                # print(html)
+        else:
+            print("此页查找不到公司log logo -w100：", url)
+        pass
+
+    """
+        @brief: 进入企业信息页，获取企业简介
+    """
+    def __get_info_Brief(self, soup, url):
+        pass
+
+    """
+        @brief: 进入企业信息页，获取企业证券信息
+    """
+    def __get_info_Securities(self, soup, url):
+        pass
+
+    """
+        @brief: 进入企业信息页，获取企业联系信息
+    """
+    def __get_info_Connection(self, soup, url):
+        pass
+
+    """
+        @brief: 进入企业信息页，获取企业详细信息
+    """
+    def __get_info_Details(self, soup, url):
         pass
 

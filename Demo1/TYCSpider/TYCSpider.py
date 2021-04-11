@@ -7,7 +7,7 @@ class TYCSpider():
         self.__functions = TYCSpiderFunctions(self.__htmlFetcher)
 
     def main_all(self):
-        self.__get_all_pages_to_mysql()
+        self.__get_company_to_mysql()
 
     """
     @brief: 在数据库中构造爬取链接 
@@ -50,7 +50,6 @@ class TYCSpider():
     """
     @brief: 在数据库中构造爬取链接 
             爬取 URL@[行业 + 省份直辖市 + 市区 + 所有分页] -> 具体公司 所有的链接 存到mysql
-    @hasTested: No
     """
     def __get_company_to_mysql(self):
         todo_page_list = get_todo_industry_province_city_qu_page()
