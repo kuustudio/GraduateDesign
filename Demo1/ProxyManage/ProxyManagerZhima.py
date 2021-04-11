@@ -2,6 +2,9 @@ from Demo1.ProxyManage.ProxyManger import *
 from Demo1.ProxyManage.ProxyIP import *
 import requests
 
+"""
+    芝麻HTTP代理管理
+"""
 class ProxyManagerZhima():
 
     def __init__(self):
@@ -17,7 +20,7 @@ class ProxyManagerZhima():
     @param:time     稳定时长 1:5-25min 2:25min-3h 3:3-6h 4:6-12h 7:48-72h
     @param:tiqu     提取模式1：直连ip 2：独享ip 3：隧道ip
     """
-    def buildAPI(self, num = 1, protocol = 'https', useTime = 1, tiqu = 2):
+    def __buildAPI(self, num = 1, protocol = 'https', useTime = 1, tiqu = 2):
         api = ''
         if tiqu == 1:
             api = 'http://webapi.http.zhimacangku.com/getip?'
@@ -42,7 +45,7 @@ class ProxyManagerZhima():
     """
     def getIP_HTTP(self, useTime = 1, tiqu = 2):
         if (self.nowProxy_http is None):
-            response_proxy = requests.get(self.buildAPI(protocol = 'http', useTime = useTime, tiqu = tiqu))
+            response_proxy = requests.get(self.__buildAPI(protocol = 'http', useTime = useTime, tiqu = tiqu))
             proxy_http = response_proxy.text.rstrip().split('\r\n').pop(0)
 
             self.nowProxy_http = ProxyIP(liveTime = 10 * 60,
@@ -82,11 +85,12 @@ class ProxyManagerZhima():
     """
     @brief: 获取https代理ip， 默认一次一个
     """
-    def getIP_HTTPS(self, useTime = 1, tiqu = 2):
-        time.sleep(2)
+    def getIP_HTTPS(self, useTime = 1, tiqu = 2, hasGetHTTP = True):
+        if hasGetHTTP:
+            time.sleep(2)
 
         if (self.nowProxy_https is None):
-            response_proxy = requests.get(self.buildAPI(protocol='https', useTime=useTime, tiqu=tiqu))
+            response_proxy = requests.get(self.__buildAPI(protocol='https', useTime=useTime, tiqu=tiqu))
             proxy_https = response_proxy.text.rstrip().split('\r\n').pop(0)
 
             self.nowProxy_https = ProxyIP(liveTime=10 * 60,
@@ -111,13 +115,13 @@ class ProxyManagerZhima():
 
             if len(self.proxies_https) == 0:
                 self.nowProxy_https = None
-                return self.getIP_HTTPS()
+                return self.getIP_HTTPS(hasGetHTTP=False)
 
             else:
                 if (len(self.proxies_https) == 1 and
                         self.proxies_https[0].__eq__(self.nowProxy_https)):
                     self.nowProxy_https = None
-                    return self.getIP_HTTPS()
+                    return self.getIP_HTTPS(hasGetHTTP=False)
                 else:
                     for proxy in self.proxies_https:
                         if not proxy.__eq__(self.nowProxy_https):
