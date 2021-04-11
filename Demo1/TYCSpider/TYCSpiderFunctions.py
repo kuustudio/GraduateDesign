@@ -20,7 +20,7 @@ class TYCSpiderFunctions():
                     2、验证码
                     3、更新Cookie
     """
-    def __noContentHandler(self, htmlText):
+    def __noContentHandler(self, htmlText, useProxy):
         pass
 
     """
@@ -37,8 +37,7 @@ class TYCSpiderFunctions():
         div = soup.find('div', class_="scope-box")
         if div is None:
             print("此页查找不到市区内容 scope-box：", province_href, "考虑代理失效导致网页返回初始界面")
-            if useProxy:
-                self.__html_fetcher.refresh_proxy()
+            self.__noContentHandler(html, useProxy)
 
             return self.get_page_city(province_href, useProxy=useProxy)
 
@@ -65,8 +64,7 @@ class TYCSpiderFunctions():
 
         if div is None:
             print("此页查找不到县区内容 scope：", city_href, "考虑被反爬虫拦截")
-            if useProxy:
-                self.__html_fetcher.refresh_proxy()
+            self.__noContentHandler(html, useProxy)
 
             return self.get_page_qu(city_href, useProxy = useProxy)
 
@@ -106,8 +104,7 @@ class TYCSpiderFunctions():
         # 如果没有上面的条件，说明被反爬挡住了
         if company_list_div is None:
             print("此页查找不到分页 ：", qu_href, "考虑被反爬虫拦截")
-            if useProxy:
-                self.__html_fetcher.refresh_proxy()
+            self.__noContentHandler(html, useProxy)
 
             return self.get_all_pages(qu_href, count + 1, useProxy = useProxy)
 
@@ -154,8 +151,7 @@ class TYCSpiderFunctions():
         # 如果没有上面的条件，说明被反爬挡住了
         if company_list_div is None:
             print("此页查找不到公司列表：", page_url, "考虑被反爬虫阻挡")
-            if useProxy:
-                self.__html_fetcher.refresh_proxy()
+            self.__noContentHandler(html, useProxy)
             return self.get_page_company(page_url, count + 1, useProxy = useProxy)
 
         a_list = company_list_div.find_all('a')
@@ -185,7 +181,7 @@ class TYCSpiderFunctions():
                                             useProxy = useProxy)
 
         soup = BeautifulSoup(html, 'html.parser')
-
+        self.__get_info_logoImg(soup, url = url)
 
     """
         @brief 进入企业信息页，获取LOGO Img
@@ -199,10 +195,11 @@ class TYCSpiderFunctions():
             img = logdiv.find('img', class_="img")
             if img is not None:
                 imgsrc = img.get('data-src')
-                # print(html)
+                with open('233.png', 'w') as f:
+                    f.write(imgsrc)
         else:
-            print("此页查找不到公司log logo -w100：", url)
-        pass
+            print("此页查找不到公司logo[@class='logo -w100']：", url)
+            return False
 
     """
         @brief: 进入企业信息页，获取企业简介
