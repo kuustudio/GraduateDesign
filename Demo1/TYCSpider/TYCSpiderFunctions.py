@@ -3,6 +3,7 @@ from Demo1.config import *
 from Demo1.TYCSpider.industry_info_list import *
 from bs4 import BeautifulSoup
 from Demo1.MySQL_EXEC_TYC.Functions import *
+from Demo1.TYCSpider.Verification.Verifier import *
 
 """
     天眼查爬虫方法类
@@ -20,8 +21,11 @@ class TYCSpiderFunctions():
                     2、验证码
                     3、更新Cookie
     """
-    def __noContentHandler(self, htmlText, useProxy):
-        pass
+    def __noContentHandler(self, htmlText, url, useProxy):
+        if useProxy:
+            self.__html_fetcher.refresh_proxy()
+        if '天眼查校验' in htmlText:
+            tycVerifier.verify(url)
 
     """
         @brief: 爬取 行业 -> 省份/直辖市 -> 市 链接
@@ -37,7 +41,7 @@ class TYCSpiderFunctions():
         div = soup.find('div', class_="scope-box")
         if div is None:
             print("此页查找不到市区内容 scope-box：", province_href, "考虑代理失效导致网页返回初始界面")
-            self.__noContentHandler(html, useProxy)
+            self.__noContentHandler(html, province_href, useProxy)
 
             return self.get_page_city(province_href, useProxy=useProxy)
 
@@ -64,7 +68,7 @@ class TYCSpiderFunctions():
 
         if div is None:
             print("此页查找不到县区内容 scope：", city_href, "考虑被反爬虫拦截")
-            self.__noContentHandler(html, useProxy)
+            self.__noContentHandler(html, city_href, useProxy)
 
             return self.get_page_qu(city_href, useProxy = useProxy)
 
@@ -104,7 +108,7 @@ class TYCSpiderFunctions():
         # 如果没有上面的条件，说明被反爬挡住了
         if company_list_div is None:
             print("此页查找不到分页 ：", qu_href, "考虑被反爬虫拦截")
-            self.__noContentHandler(html, useProxy)
+            self.__noContentHandler(html, qu_href, useProxy)
 
             return self.get_all_pages(qu_href, count + 1, useProxy = useProxy)
 
@@ -151,7 +155,7 @@ class TYCSpiderFunctions():
         # 如果没有上面的条件，说明被反爬挡住了
         if company_list_div is None:
             print("此页查找不到公司列表：", page_url, "考虑被反爬虫阻挡")
-            self.__noContentHandler(html, useProxy)
+            self.__noContentHandler(html, page_url, useProxy)
             return self.get_page_company(page_url, count + 1, useProxy = useProxy)
 
         a_list = company_list_div.find_all('a')

@@ -7,7 +7,7 @@ class TYCSpider():
         self.__functions = TYCSpiderFunctions(self.__htmlFetcher)
 
     def main_all(self):
-        self.__get_company_to_mysql()
+        self.__get_all_pages_to_mysql()
 
     """
     @brief: 在数据库中构造爬取链接 
