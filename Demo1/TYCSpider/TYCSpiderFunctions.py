@@ -31,7 +31,7 @@ class TYCSpiderFunctions():
         @brief: 爬取 行业 -> 省份/直辖市 -> 市 链接
     """
     def get_page_city(self, province_href, useProxy = True):
-        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc)
+        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc[0])
 
         html = self.__html_fetcher.get_html(url = province_href,
                                             count = 1,
@@ -57,7 +57,7 @@ class TYCSpiderFunctions():
         @brief: 爬取 行业 -> 省份直辖市 -> 市 -> 区/县 链接
     """
     def get_page_qu(self, city_href, useProxy = False):
-        self.__html_fetcher.setCookie(cookie=Cookie_init_tyc)
+        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc[0])
 
         html = self.__html_fetcher.get_html(url = city_href,
                                             count = 1,
@@ -88,7 +88,7 @@ class TYCSpiderFunctions():
             print('本页面爬取失败：', qu_href)
             return
 
-        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc)
+        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc[0])
 
         html = self.__html_fetcher.get_html(url = qu_href,
                                             count = 1,
@@ -139,7 +139,7 @@ class TYCSpiderFunctions():
         if count > self.__antiRobot_retries:
             return
 
-        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc)
+        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc[0])
         html = self.__html_fetcher.get_html(url = page_url,
                                             count = 1,
                                             useProxy = useProxy)
@@ -178,7 +178,7 @@ class TYCSpiderFunctions():
             print("重试超过%d次：建议停机检查：" % self.__antiRobot_retries, url)
             return
 
-        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc)
+        self.__html_fetcher.setCookie(cookie = Cookie_init_tyc[0])
 
         html = self.__html_fetcher.get_html(url = url,
                                             count = 1,

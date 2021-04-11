@@ -302,4 +302,6 @@ Cookie_init_tyc_list = [
 
 cookieSetter = CookieSetter(Cookie_init_tyc_list)
 
-Cookie_init_tyc = cookieSetter.strCookie
+# 改为list，类型为引用，可在外修改
+Cookie_init_tyc = []
+Cookie_init_tyc.append(cookieSetter.strCookie)

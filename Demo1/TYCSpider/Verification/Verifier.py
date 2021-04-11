@@ -54,8 +54,8 @@ class TYCVerifier():
         self.__cookies = config.Cookie_init_tyc_list
 
         config.cookieSetter.changed(config.Cookie_init_tyc_list)
-        global Cookie_init_tyc
-        Cookie_init_tyc = config.cookieSetter.strCookie
+
+        Cookie_init_tyc[0] = config.cookieSetter.strCookie
 
         self.__browser.close()
 
