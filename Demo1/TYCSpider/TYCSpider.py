@@ -7,7 +7,7 @@ class TYCSpider():
         self.__functions = TYCSpiderFunctions(self.__htmlFetcher)
 
     def main_all(self):
-        self.__get_all_pages_to_mysql()
+        self.__get_company_info_to_mysql()
 
     """
     @brief: 在数据库中构造爬取链接 
@@ -66,12 +66,13 @@ class TYCSpider():
     @hasTested: No
     """
     def __get_company_info_to_mysql(self):
-        todo_company_list = get_company_task()
+        todo_company_list = get_todo_company_limit()
         while len(todo_company_list) > 0:
             for todo_url in todo_company_list:
-                print("开始爬取未爬的公司：", todo_url['@hrefs'])
-                self.__functions.get_info(todo_url['@hrefs'], 1)
-            todo_company_list = get_company_task()
+                print("开始爬取未爬的公司：", todo_url['id'])
+                self.__functions.get_info(todo_url['id'], 1)
+                finish_company(todo_url['id'])
+            todo_company_list = get_todo_company_limit()
 
 if __name__ == '__main__':
     spider = TYCSpider()

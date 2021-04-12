@@ -4,13 +4,13 @@ from Demo1.MySQL_EXEC_TYC.config import *
 import time
 
 connect = pymysql.Connect(
-    host=host,
-    port=port,
-    user=user,
-    passwd=passwd,
-    db=db,
-    charset=charset,
-    cursorclass=pymysql.cursors.DictCursor
+    host = host,
+    port = port,
+    user = user,
+    passwd = passwd,
+    db = db,
+    charset = charset,
+    cursorclass = pymysql.cursors.DictCursor
 )
 cursor = connect.cursor()
 
@@ -35,7 +35,9 @@ def excute(sql, data):
 
     connect.commit()
 
-
+"""
+    暂未使用，暴力更新公司信息
+"""
 def update_company(data):
     sql = "update t_company set img= '%s', compCh= '%s', compEn= '%s', sscym= '%s', gsdj= '%s', zczb= '%s', " \
           "sshy= '%s', dsz= '%s', dm= '%s', fddbr= '%s', zjl= '%s', ygrs= '%s', glryrs= '%s', kggd= '%s', sjkzr= '%s', " \
@@ -44,36 +46,85 @@ def update_company(data):
           "where id= '%s' "
     excute(sql, data)
 
+"""
+    更新数据库公司logo
+"""
+def update_company_imgSource(data):
+    sql = "update t_company set img='%s' where id = '%s'"
+    excute(sql, data)
 
+"""
+    更新数据库公司企业背景信息
+"""
 def update_company_qybj(data):
     sql = "update t_company set compCh= '%s', fddbrr = '%s', zczb1 = '%s', sjzb1 = '%s', clrq1 = '%s', jyzt1 = '%s', " \
           "tyshxxdm1 = '%s', gszc1 = '%s', nsrsbh1 = '%s', zzjgdm1 = '%s', gslx1 = '%s', hy1 = '%s', " \
           "hzrq1 = '%s', djjg1 = '%s', yyqx1 = '%s', nsrzz1 = '%s', rygm1 = '%s', cbrs1 = '%s', cym1 = '%s', " \
-          "ywmc1 = '%s', zcdz1 = '%s', jyfw1 = '%s', flag= true  " \
+          "ywmc1 = '%s', zcdz1 = '%s', jyfw1 = '%s' " \
           "where id= '%s' "
     excute(sql, data)
 
+    sql = "update t_company set compEn = '%s', " \
+          "sscym = '%s', gsdj = '%s', zczb = '%s', sshy = '%s', " \
+          "fddbr = '%s', ygrs = '%s', zyyw = '%s' where id = '%s'"
 
+    data_1 = (data[len(data) - 4],
+              data[len(data) - 5],
+              data[7],
+              data[2],
+              data[11],
+              data[1],
+              data[len(data) - 7],
+              data[len(data) - 2],
+              data[len(data) - 1])
+
+    excute(sql, data_1)
+
+"""
+    更新数据库企业简介信息
+"""
 def update_company_qyjj(data):
     sql = "update t_company set compCh= '%s', compEn= '%s', sscym= '%s', gsdj= '%s', zczb= '%s', " \
           "sshy= '%s', dsz= '%s', dm= '%s', fddbr= '%s', zjl= '%s', ygrs= '%s', glryrs= '%s', kggd= '%s', sjkzr= '%s', " \
-          "zzkzr= '%s', zyyw= '%s', flag = true " \
+          "zzkzr= '%s', zyyw= '%s' " \
           "where id= '%s' "
     excute(sql, data)
 
+"""
+    更新数据库企业管理人员信息
+"""
+def update_company_manage(data):
+    sql = "update t_company set dsz = '%s', " \
+          "dm = '%s', zjl = '%s', glryrs = '%s' where id = '%s'"
+    excute(sql, data)
 
+"""
+    更新数据库证券信息
+"""
 def update_company_zqxx(data):
-    sql = "update t_company set agdm= '%s', agjc= '%s', bgdm= '%s', bgjc= '%s', hgdm= '%s', hgjc= '%s', zqlb= '%s', flag = true " \
+    sql = "update t_company set agdm= '%s', agjc= '%s', bgdm= '%s', bgjc= '%s', hgdm= '%s', hgjc= '%s', zqlb= '%s' " \
           "where id= '%s' "
     excute(sql, data)
 
-
+"""
+    更新数据库联系方式信息
+"""
 def update_company_lxxx(data):
-    sql = "update t_company set lxdh= '%s', dzyx= '%s', cz= '%s', gswz= '%s', qy= '%s', yzbm= '%s', bgdz= '%s', zcdz= '%s', flag = true " \
+    sql = "update t_company set lxdh= '%s', dzyx= '%s', cz= '%s', gswz= '%s', qy= '%s', yzbm= '%s', bgdz= '%s', zcdz= '%s' " \
           "where id= '%s' "
     excute(sql, data)
 
+"""
+    标记某公司信息完成爬取
+"""
+def finish_company(company_href):
+    sql = "update t_company set flag = TRUE where id = '%s'"
+    cursor.execute(sql % company_href)
+    connect.commit()
 
+"""
+    插入新公司
+"""
 def insert_company(id):
     sql = "INSERT IGNORE INTO `t_company`(`id`, `flag`) VALUES ('%s', '%d')"
     cursor.execute(sql % (id, False))
@@ -123,6 +174,9 @@ def get_todo_company_limit():
     todo_href_list = cursor.fetchall()
     return todo_href_list
 
+"""
+    获取某企业的具体信息 URL
+"""
 def get_company_task():
     sql1 = 'SET @hrefs := 0;  '
     sql2 = 'UPDATE t_company SET flag = 1, id = (SELECT @hrefs := id)WHERE flag  = 0  LIMIT 1;'
@@ -141,58 +195,76 @@ def insert_industry_province(href):
     cursor.execute(sql % (href, False))
     connect.commit()
 
-
+"""
+    插入新城市
+"""
 def insert_industry_province_city(href):
     sql = "INSERT IGNORE INTO `t_industry_province_city`(`href`, `flag`) VALUES ('%s', '%d')"
     cursor.execute(sql % (href, False))
     connect.commit()
 
-
+"""
+    插入新的区/县
+"""
 def insert_industry_province_city_qu(href):
     sql = "INSERT IGNORE INTO `t_industry_province_city_qu`(`href`, `flag`) VALUES ('%s', '%d')"
     cursor.execute(sql % (href, False))
     connect.commit()
 
-
+"""
+    插入新的具体分页
+"""
 def insert_industry_province_city_qu_page(href):
     sql = "INSERT IGNORE INTO `t_industry_province_city_qu_page`(`href`, `flag`) VALUES ('%s', '%d')"
     cursor.execute(sql % (href, False))
     connect.commit()
 
-
+"""
+    获取要爬取的城市url
+"""
 def get_todo_industry_province_city():
     sql = 'select href from t_industry_province_city where flag = false limit 100'
     cursor.execute(sql)
     todo_href_list = cursor.fetchall()
     return todo_href_list
 
-
+"""
+    标记此城市的所有 区/县 信息已经全部爬取完
+"""
 def do_industry_province_city(href):
     sql = 'update t_industry_province_city  set flag= true where href = "%s"' % href
     cursor.execute(sql)
     connect.commit()
 
-
+"""
+    获取要爬取的 区/县 URL
+"""
 def get_todo_industry_province_city_qu():
     sql = 'select href from t_industry_province_city_qu where flag = false limit 100'
     cursor.execute(sql)
     todo_href_list = cursor.fetchall()
     return todo_href_list
 
-
+"""
+    标记此 区/县 的所有分页信息已经爬取完
+"""
 def do_industry_province_city_qu(href):
     sql = 'update t_industry_province_city_qu  set flag= true where href = "%s"' % href
     cursor.execute(sql)
     connect.commit()
 
-
+"""
+    获取未爬取的分页
+"""
 def get_todo_industry_province_city_qu_page():
     sql = 'select href from t_industry_province_city_qu_page where flag = false limit 100'
     cursor.execute(sql)
     todo_href_list = cursor.fetchall()
     return todo_href_list
 
-
+"""
+    标记某分页的所有公司url已经爬取完成
+"""
 def do_industry_province_city_qu_page(href):
     sql = 'update t_industry_province_city_qu_page  set flag= true where href = "%s"' % href
     cursor.execute(sql)

@@ -66,7 +66,7 @@ class HTML_Fetcher():
             print("重试超过%d次：建议停机检查：" % HTML_Fetcher.html_retries,
                   url,
                   "目前正在使用代理" if useProxy else "目前不使用代理")
-            return
+            return ''
 
         # 检查是否先设置了代理
         if (useProxy):
