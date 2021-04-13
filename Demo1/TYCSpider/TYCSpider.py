@@ -97,6 +97,7 @@ class TYCSpider():
         todo_company_list = get_todo_company_limit(searchMode)
         while len(todo_company_list) > 0:
             for todo_url in todo_company_list:
+                print('=====================================================================')
                 print("开始爬取未爬的公司：", todo_url['id'])
                 self.__functions.get_info(todo_url['id'], 1, searchMode = searchMode)
                 finish_company(todo_url['id'], searchMode)
@@ -104,5 +105,5 @@ class TYCSpider():
 
 if __name__ == '__main__':
     spider = TYCSpider()
-    spider.main_search('腾讯')
-    # spider.main_all()
+    # spider.main_search('腾讯')
+    spider.main_all()

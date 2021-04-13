@@ -276,7 +276,7 @@ class TYCSpiderFunctions():
                 #可以考虑存图片
                 data = (imgsrc, url)
                 update_company_imgSource(data, searchMode)
-                print('\t图片：', imgsrc)
+                print('\t4、图片source：', imgsrc)
                 return True
         else:
             print("\t此页查找不到公司logo[@class='logo -w100']：", url)
@@ -317,6 +317,7 @@ class TYCSpiderFunctions():
                     zjl = names[i]
 
             data = (dsz, dm, zjl, glryrs, url)
+            print('\t6、企业管理人员信息：', data)
             update_company_manage(data, searchMode)
             return True
 
@@ -389,7 +390,7 @@ class TYCSpiderFunctions():
 
                     contact_info = (lxdh, dzyx, cz, gswz, qy, yzbm, bgdz, zcdz, url)
 
-                    print('\t企业联系信息：', contact_info)
+                    print('\t5、企业联系信息：', contact_info)
 
                     update_company_lxxx(contact_info, searchMode)
 
@@ -418,7 +419,7 @@ class TYCSpiderFunctions():
                 compCh = ""
             else:
                 compCh = compChdiv.find('h1', class_="name").get_text()
-                print('\t', "企业全名：", compCh)
+                print("\t1、企业全名：", compCh)
 
             frdiv = div.find('div', class_="humancompany")
             fddbrr = "None"
@@ -431,7 +432,7 @@ class TYCSpiderFunctions():
                     print('\t\t此页没有公司法人[//tr/span]', url, "考虑被反爬虫阻挡！但不返回")
             else:
                 fddbrr = frdiv.find('a', class_="link-click").get_text()  # 法定代表人
-                print('\t公司法人：', fddbrr)
+                print('\t2、公司法人：', fddbrr)
 
             table = div.find('table', class_="table -striped-col -breakall")
             if table is None:
@@ -514,5 +515,5 @@ class TYCSpiderFunctions():
                 gszc1, nsrsbh1, zzjgdm1, gslx1, hy1, hzrq1, djjg1,
                 yyqx1, nsrzz1, rygm1, cbrs1, cym1, ywmc1, zcdz1, jyfw1, url)
 
-        print('\t公司详细信息：', url, data)
+        print('\t3、公司详细信息：', url, data)
         update_company_qybj(data, searchMode = search)
