@@ -134,9 +134,66 @@ class TYCSpiderFunctions():
             # qu_list.append(qu_href)
 
     """
-        @brief: 在一个具体的分页下，爬取所有公司的链接
+        @brief: 搜索页面下，爬取所有分页的链接
     """
-    def get_page_company(self, page_url, count, useProxy = False):
+    def get_all_pages_search(self, search_href, count, useProxy = False):
+        if count > self.__antiRobot_retries:
+            print('本页面爬取失败：', search_href)
+            return []
+
+        allPagesSearch = []
+
+        self.__html_fetcher.setCookie(cookie=Cookie_init_tyc[0])
+
+        html = self.__html_fetcher.get_html(url=search_href,
+                                            count=1,
+                                            useProxy=useProxy)
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+        div = soup.find('div', class_="search-pager")
+
+        company_list_div = soup.find('div', class_="result-list sv-search-container")
+
+        no_company_div = soup.find('div', class_="no-result-container deep-search-detail")
+        # 此条件下确实没有分页信息或者公司
+        if no_company_div is not None:
+            return []
+
+        # 如果没有上面的条件，说明被反爬挡住了
+        if company_list_div is None:
+            print("此页查找不到分页 ：", search_href, "考虑被反爬虫拦截")
+            self.__noContentHandler(html, search_href, useProxy)
+
+            return self.get_all_pages(search_href, count + 1, useProxy=useProxy)
+
+        # 如果公司列表的不为空，而分页为空，说明只有这一页
+        if div is None:
+            allPagesSearch.append({'href' : search_href})
+            return allPagesSearch
+
+        a_list = div.find_all('a')
+        page_list = []
+        page_num = len(a_list) - 1  # 页数
+        page_count = 0
+        for page_a in a_list:
+            if page_count > 4:  # 后面的页数需要会员
+                break
+            page_count += 1
+            if page_count > page_num:  # 少于5页，最后一个是下一页，不用加入
+                break
+            page_href = page_a.get('href')
+            print("分页:", page_href)
+            allPagesSearch.append({'href' : page_href})
+            # qu_list.append(search_href)
+        return allPagesSearch
+
+    """
+        @brief: 在一个具体的分页下，爬取所有公司的链接
+        @:param [mode = 1] 全爬虫模式，公司url插入t_company
+                [mode = 2] 搜索模式，公司url插入t_company_search
+    """
+    def get_page_company(self, page_url, count, useProxy = False, mode = 1):
         if count > self.__antiRobot_retries:
             return
 
@@ -157,7 +214,7 @@ class TYCSpiderFunctions():
         if company_list_div is None:
             print("此页查找不到公司列表：", page_url, "考虑被反爬虫阻挡")
             self.__noContentHandler(html, page_url, useProxy)
-            return self.get_page_company(page_url, count + 1, useProxy = useProxy)
+            return self.get_page_company(page_url, count + 1, useProxy = useProxy, mode = mode)
 
         a_list = company_list_div.find_all('a')
 
@@ -167,14 +224,18 @@ class TYCSpiderFunctions():
                     if len(str(item.get("href"))) > 36:
                         company_href = str(item.get("href"))
                         print('\t公司链接：', company_href)
-                        insert_company(company_href)
+                        if mode == 1:
+                            insert_company(company_href)
+                        else:
+                            insert_search_company(company_href,
+                                                  keyWord = page_url[page_url.find('=') + 1 : len(page_url)])
                         company_href_list.append(company_href)
         print("此页一共爬取公司数: ", len(company_href_list))
 
     """
         @brief 获取企业详细信息
     """
-    def get_info(self, url, count, useProxy = False):
+    def get_info(self, url, count, useProxy = False, searchMode = False):
         if count > self.__antiRobot_retries:
             print("重试超过%d次：建议停机检查：" % self.__antiRobot_retries, url)
             return
@@ -187,15 +248,15 @@ class TYCSpiderFunctions():
 
         soup = BeautifulSoup(html, 'html.parser')
 
-        if not self.__get_info_Details(soup, url):
+        if not self.__get_info_Details(soup, url, searchMode):
             self.__noContentHandler(html, url, useProxy)
-            return self.get_info(url, count + 1, useProxy)
+            return self.get_info(url, count + 1, useProxy, searchMode)
 
-        self.__get_info_logoImg(soup, url = url)
+        self.__get_info_logoImg(soup, url = url, searchMode = searchMode)
 
-        self.__get_info_Connection(soup, url = url)
+        self.__get_info_Connection(soup, url = url, searchMode = searchMode)
 
-        self.__get_info_Manager(soup, url)
+        self.__get_info_Manager(soup, url, searchMode = searchMode)
 
 
     """
@@ -203,7 +264,7 @@ class TYCSpiderFunctions():
         此项非必须爬取到，因为有些公司没有logo
         @ setData : img 图片source url
     """
-    def __get_info_logoImg(self, soup, url):
+    def __get_info_logoImg(self, soup, url, searchMode = False):
         # 企业logo
         logdiv = soup.find('div', class_="logo -w100")
         if logdiv is not None:
@@ -214,7 +275,7 @@ class TYCSpiderFunctions():
                 #    imgsrc, count = 1, useProxy = False)
                 #可以考虑存图片
                 data = (imgsrc, url)
-                update_company_imgSource(data)
+                update_company_imgSource(data, searchMode)
                 print('\t图片：', imgsrc)
                 return True
         else:
@@ -224,7 +285,7 @@ class TYCSpiderFunctions():
     """
         @brief: 进入企业信息页，获取企业人员信息
     """
-    def __get_info_Manager(self, soup, url):
+    def __get_info_Manager(self, soup, url, searchMode = False):
         manager = soup.find('div', id = '_container_staffCount')
         if manager is None:
             print('\t无企业人员信息', url)
@@ -256,7 +317,7 @@ class TYCSpiderFunctions():
                     zjl = names[i]
 
             data = (dsz, dm, zjl, glryrs, url)
-            update_company_manage(data)
+            update_company_manage(data, searchMode)
             return True
 
     """
@@ -271,7 +332,7 @@ class TYCSpiderFunctions():
         @setData: lxdh, dzyx, cz, gswz, qy, yzbm, bgdz, zcdz
                 联系电话，电子邮箱，传真，公司网址，区域，邮政编码，办公地址，注册地址
     """
-    def __get_info_Connection(self, soup, url):
+    def __get_info_Connection(self, soup, url, searchMode = False):
         div = soup.find('div', class_='box -company-box')
 
         if div is None or len(div) is 0:
@@ -330,7 +391,7 @@ class TYCSpiderFunctions():
 
                     print('\t企业联系信息：', contact_info)
 
-                    update_company_lxxx(contact_info)
+                    update_company_lxxx(contact_info, searchMode)
 
                     return True
 
@@ -344,7 +405,7 @@ class TYCSpiderFunctions():
                   nsrsbh1, zzjgdm1, yyqx1, nsrzz1, hzrq1, gslx1, hy1, rygm1,
                   cbrs1, djjg1, cym1, ywmc1, zcdz1, jyfw1
     """
-    def __get_info_Details(self, soup, url):
+    def __get_info_Details(self, soup, url, searchMode = False):
         div = soup.find('div', id="_container_baseInfo")
 
         if div is None:
@@ -389,7 +450,8 @@ class TYCSpiderFunctions():
                         compCh = compCh,
                         fddbrr = fddbrr,
                         url = url,
-                        mode = 2)
+                        mode = 2,
+                        search = searchMode)
             else:
                 tds = table.find_all('td')
                 if len(tds) <= 40:
@@ -399,10 +461,11 @@ class TYCSpiderFunctions():
                                                compCh = compCh,
                                                fddbrr = fddbrr,
                                                url = url,
-                                               mode = 1)
+                                               mode = 1,
+                                               search = searchMode)
             return True
 
-    def __get_info_Details_to_sql(self, tds, compCh, fddbrr, url, mode = 1):
+    def __get_info_Details_to_sql(self, tds, compCh, fddbrr, url, mode = 1, search = False):
         if (mode == 1):
             jyzt1 = tds[3].get_text()  # 经营状态
             clrq1 = tds[7].get_text()  # 成立日期
@@ -452,4 +515,4 @@ class TYCSpiderFunctions():
                 yyqx1, nsrzz1, rygm1, cbrs1, cym1, ywmc1, zcdz1, jyfw1, url)
 
         print('\t公司详细信息：', url, data)
-        update_company_qybj(data)
+        update_company_qybj(data, searchMode = search)

@@ -49,24 +49,39 @@ def update_company(data):
 """
     更新数据库公司logo
 """
-def update_company_imgSource(data):
-    sql = "update t_company set img='%s' where id = '%s'"
+def update_company_imgSource(data, searchMode):
+    if not searchMode:
+        sql = "update t_company set img='%s' where id = '%s'"
+    else:
+        sql = "update t_company_search set img='%s' where id = '%s'"
     excute(sql, data)
 
 """
     更新数据库公司企业背景信息
 """
-def update_company_qybj(data):
-    sql = "update t_company set compCh= '%s', fddbrr = '%s', zczb1 = '%s', sjzb1 = '%s', clrq1 = '%s', jyzt1 = '%s', " \
-          "tyshxxdm1 = '%s', gszc1 = '%s', nsrsbh1 = '%s', zzjgdm1 = '%s', gslx1 = '%s', hy1 = '%s', " \
-          "hzrq1 = '%s', djjg1 = '%s', yyqx1 = '%s', nsrzz1 = '%s', rygm1 = '%s', cbrs1 = '%s', cym1 = '%s', " \
-          "ywmc1 = '%s', zcdz1 = '%s', jyfw1 = '%s' " \
-          "where id= '%s' "
+def update_company_qybj(data, searchMode):
+    if searchMode:
+        sql = "update t_company_search set compCh= '%s', fddbrr = '%s', zczb1 = '%s', sjzb1 = '%s', clrq1 = '%s', jyzt1 = '%s', " \
+              "tyshxxdm1 = '%s', gszc1 = '%s', nsrsbh1 = '%s', zzjgdm1 = '%s', gslx1 = '%s', hy1 = '%s', " \
+              "hzrq1 = '%s', djjg1 = '%s', yyqx1 = '%s', nsrzz1 = '%s', rygm1 = '%s', cbrs1 = '%s', cym1 = '%s', " \
+              "ywmc1 = '%s', zcdz1 = '%s', jyfw1 = '%s' " \
+              "where id= '%s' "
+    else:
+        sql = "update t_company set compCh= '%s', fddbrr = '%s', zczb1 = '%s', sjzb1 = '%s', clrq1 = '%s', jyzt1 = '%s', " \
+              "tyshxxdm1 = '%s', gszc1 = '%s', nsrsbh1 = '%s', zzjgdm1 = '%s', gslx1 = '%s', hy1 = '%s', " \
+              "hzrq1 = '%s', djjg1 = '%s', yyqx1 = '%s', nsrzz1 = '%s', rygm1 = '%s', cbrs1 = '%s', cym1 = '%s', " \
+              "ywmc1 = '%s', zcdz1 = '%s', jyfw1 = '%s' " \
+              "where id= '%s' "
     excute(sql, data)
 
-    sql = "update t_company set compEn = '%s', " \
-          "sscym = '%s', gsdj = '%s', zczb = '%s', sshy = '%s', " \
-          "fddbr = '%s', ygrs = '%s', zyyw = '%s' where id = '%s'"
+    if not searchMode:
+        sql = "update t_company set compEn = '%s', " \
+              "sscym = '%s', gsdj = '%s', zczb = '%s', sshy = '%s', " \
+              "fddbr = '%s', ygrs = '%s', zyyw = '%s' where id = '%s'"
+    else:
+        sql = "update t_company_search set compEn = '%s', " \
+              "sscym = '%s', gsdj = '%s', zczb = '%s', sshy = '%s', " \
+              "fddbr = '%s', ygrs = '%s', zyyw = '%s' where id = '%s'"
 
     data_1 = (data[len(data) - 4],
               data[len(data) - 5],
@@ -93,9 +108,13 @@ def update_company_qyjj(data):
 """
     更新数据库企业管理人员信息
 """
-def update_company_manage(data):
-    sql = "update t_company set dsz = '%s', " \
-          "dm = '%s', zjl = '%s', glryrs = '%s' where id = '%s'"
+def update_company_manage(data, searchMode):
+    if searchMode:
+        sql = "update t_company_search set dsz = '%s', " \
+              "dm = '%s', zjl = '%s', glryrs = '%s' where id = '%s'"
+    else:
+        sql = "update t_company set dsz = '%s', " \
+              "dm = '%s', zjl = '%s', glryrs = '%s' where id = '%s'"
     excute(sql, data)
 
 """
@@ -109,16 +128,23 @@ def update_company_zqxx(data):
 """
     更新数据库联系方式信息
 """
-def update_company_lxxx(data):
-    sql = "update t_company set lxdh= '%s', dzyx= '%s', cz= '%s', gswz= '%s', qy= '%s', yzbm= '%s', bgdz= '%s', zcdz= '%s' " \
-          "where id= '%s' "
+def update_company_lxxx(data, searchMode):
+    if searchMode:
+        sql = "update t_company_search set lxdh= '%s', dzyx= '%s', cz= '%s', gswz= '%s', qy= '%s', yzbm= '%s', bgdz= '%s', zcdz= '%s' " \
+              "where id= '%s' "
+    else:
+        sql = "update t_company set lxdh= '%s', dzyx= '%s', cz= '%s', gswz= '%s', qy= '%s', yzbm= '%s', bgdz= '%s', zcdz= '%s' " \
+              "where id= '%s' "
     excute(sql, data)
 
 """
     标记某公司信息完成爬取
 """
-def finish_company(company_href):
-    sql = "update t_company set flag = TRUE where id = '%s'"
+def finish_company(company_href, searchMode = False):
+    if not searchMode:
+        sql = "update t_company set flag = TRUE where id = '%s'"
+    else:
+        sql = "update t_company_search set flag = TRUE where id = '%s'"
     cursor.execute(sql % company_href)
     connect.commit()
 
@@ -128,6 +154,14 @@ def finish_company(company_href):
 def insert_company(id):
     sql = "INSERT IGNORE INTO `t_company`(`id`, `flag`) VALUES ('%s', '%d')"
     cursor.execute(sql % (id, False))
+    connect.commit()
+
+"""
+    在搜索模式下插入新公司
+"""
+def insert_search_company(id, keyWord):
+    sql = "insert ignore into `t_company_search`(`keyWord`, `id`, `flag`) VALUES ('%s', '%s', '%d')"
+    cursor.execute(sql % (keyWord, id, False))
     connect.commit()
 
 
@@ -168,8 +202,11 @@ def get_todo_company(start,num):
     todo_href_list = cursor.fetchall()
     return todo_href_list
 
-def get_todo_company_limit():
-    sql = 'select id from t_company where flag = false limit 100'
+def get_todo_company_limit(searchMode = False):
+    if not searchMode:
+        sql = 'select id from t_company where flag = false limit 100'
+    else:
+        sql = 'select id from t_company_search where flag = false limit 100'
     cursor.execute(sql)
     todo_href_list = cursor.fetchall()
     return todo_href_list
