@@ -21,6 +21,22 @@ headers_tyc = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36"
     }
 
+headers_credit = {
+"Accept": "application/json, text/javascript, */*; q=0.01",
+"Accept-Encoding": "gzip, deflate, br",
+"Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6,zh-HK;q=0.5",
+"Connection": "keep-alive",
+"Host": "public.creditchina.gov.cn",
+"Origin": "https://www.creditchina.gov.cn",
+"Referer": "https://www.creditchina.gov.cn/",
+"sec-ch-ua": '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+"sec-ch-ua-mobile": "?0",
+"Sec-Fetch-Dest": "empty",
+"Sec-Fetch-Mode": "cors",
+"Sec-Fetch-Site": "same-site",
+"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
+}
+
 Cookie_init_tyc_list = [
 {
     "domain": ".tianyancha.com",

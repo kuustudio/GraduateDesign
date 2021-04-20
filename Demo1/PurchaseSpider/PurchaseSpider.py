@@ -25,7 +25,7 @@ class Purchase():
             '''
             pageNum = int(itemNum / 20) + 1
             for index in range(2, pageNum + 1):
-                time.sleep(2)
+                time.sleep(3)
                 page_next = Page(index, self.__keyword, self.__html_fetcher)
                 page_next.getPage()
                 if (index == pageNum):
@@ -34,6 +34,6 @@ class Purchase():
                     page_next.analyseItem(last_page=False)
                 self.__pages.append(page_next)
 
-# if __name__ == '__main__':
-#     purchase = Purchase('机')
-#     purchase.getAllPages()
+if __name__ == '__main__':
+    purchase = Purchase('机')
+    purchase.getAllPages()

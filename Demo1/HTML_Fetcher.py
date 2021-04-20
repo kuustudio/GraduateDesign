@@ -58,7 +58,7 @@ class HTML_Fetcher():
         获取网页HTML TEXT
     """
 
-    def get_html(self, url, count, useProxy=True, data=''):
+    def get_html(self, url, count, useProxy=True, data=None):
         if self.name == '天眼查':
             assert len(self.cookie) > 0
 
@@ -75,19 +75,28 @@ class HTML_Fetcher():
                                 HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
             assert (len(self.proxy_http) > 0)
             assert (len(self.proxy_https) > 0)
-            print("爬取此网页：", url, "次数：", count, "时间：", time.time(), " 代理IP：",
+            print(("爬取此网页：" if data is None else "携带参数请求此URL："), url, "次数：", count, "时间：", time.time(), " 代理IP：",
                   self.proxy_https if 'https' in url else self.proxy_http)
         else:
-            print("爬取此网页：", url, "次数：", count, "时间：", time.time(), "不使用代理IP")
+            print(("爬取此网页：" if data is None else "携带参数请求此URL："), url, "次数：", count, "时间：", time.time(), "不使用代理IP")
 
         if (self.request_type == 'GET'):
             try:
                 if not useProxy:
-                    response = requests.get(url, headers = self.headers)
+                    if data is None:
+                        response = requests.get(url, headers = self.headers)
+                    else:
+                        response = requests.get(url, headers = self.headers, params = data)
                 else:
-                    response = requests.get(url, headers = self.headers,
-                                            proxies = self.proxy,
-                                            timeout = HTML_Fetcher.request_timeout)
+                    if data is None:
+                        response = requests.get(url, headers = self.headers,
+                                                proxies = self.proxy,
+                                                timeout = HTML_Fetcher.request_timeout)
+                    else:
+                        response = requests.get(url, headers = self.headers,
+                                                proxies = self.proxy,
+                                                timeout = HTML_Fetcher.request_timeout,
+                                                params = data)
             except BaseException:
                 print("请求过程中，异常发生")
                 # 这里没有对异常情况作具体处理，只是直接换代理IP 重新请求 就完事昂
