@@ -1,6 +1,7 @@
 import json
 from Demo1.HzaeeSpider.ItemParseFunctions_CQZR import *
 from Demo1.HzaeeSpider.ItemParseFunctions_ZCZR import *
+from Demo1.HzaeeSpider.ItemParseFunctions_FWZL import *
 
 class HzaeeItem():
     def __init__(self, guoyou, infoDict, htmlFetcher, ItemType = 1):
@@ -17,9 +18,9 @@ class HzaeeItem():
         elif ItemType == 4:
             self.__dealQYZZ()
         elif ItemType == 5:
-            self.__dealZS()
-        elif ItemType == 6:
             self.__dealFWZL()
+        elif ItemType == 6:
+            self.__dealZS()
         else:
             self.__dealELSE()
 
@@ -41,7 +42,7 @@ class HzaeeItem():
         self.legalPerson = ''  # 标的企业的企业法人
         self.establishDate = ''  # 标的企业的成立日期
         self.registeredCapital = ''  # 标的企业的注册资本
-        self.companyType = ''  # 标的企业的实缴资本
+        self.paidCapital = ''  # 标的企业的实缴资本
         self.companyType = ''  # 标的企业的企业类型
         self.industry = ''  # 标的企业的所属行业
         self.employeNum = ''  # 标的企业的职工人数
@@ -221,10 +222,70 @@ class HzaeeItem():
         pass
 
     def __initAttribute_FWZL(self):
-        pass
+        self.createDate = ''  # 信息披露创建时间
+        self.itemId = ''  # 标的Id，用于构造Url
+        self.name = ''  # 标的名称
+        self.number = ''  # 标的编号
+        self.startDate = ''  # 信息披露起始时间
+        self.endDate = ''  # 信息披露截至时间
+        self.area = ''  # 标的企业所在地区
+        self.industry = ''  # 标的企业所属行业
+        self.reservePrice = ''  # 转让底价
+        self.contactInfo = ''  # 联系人及电话
+        self.transferCommitment = ''  # 转让申请与承诺
+        self.isMortgage = ''  # 标的是否存在抵押情况
+        self.isPriorityPurchase = ''  # 权利人是否有意向行使优先购买
+
+        self.houseName = ''  # 房屋名称
+        self.location = ''  # 坐落位置
+        self.useStatus = ''  # 使用现状
+        self.propertyType = ''  # 物业类型
+        self.improperPropertyLicenseNumber = ''  # 不动产权证号
+        self.purpose = ''  # 用途
+        self.commonSituation = ''  # 共有情况
+        self.area = ''  # 面积
+        self.natureRights = ''  # 权利性质
+        self.periodUse = ''  # 使用期限
+        self.otherDisclosures = ''  # 其他披露事项
+
+        self.houseOwnershipCertificate = ''  # 房屋所有权证号
+        self.planPurposes = ''  # 规划用途
+        self.propertyNature = ''  # 房屋性质
+        self.constructionArea = ''  # 建筑面积
+        self.landUseCertificateNumber = ''  # 土地使用证号
+        self.gentle = ''  # 地类（用途）
+        self.useRightType = ''  # 使用权类型
+        self.endDate = ''  # 终止日期
+        self.rightUseArea = ''  # 使用权
+
+        self.rentalReservePrice = ''  # 出租底价
+        self.rentalArea = ''  # 出租面积
+        self.rentalPeriod = ''  # 出租期限
+        self.rentDate = ''  # 起租日
+        self.rentFreePeriod = ''  # 免租期
+        self.rentPaymentRequest = ''  # 租金支付条件
+        self.rentAdjustmentMethod = ''  # 租金调整方式
+        self.performanceBondPaymentRequirements = ''  # 履约保证金支付要求
+        self.waterElectricityAgreement = ''  # 水电气物业费等费用的约定
+        self.rentalUseRequirements = ''  # 出租用途要求
+        self.allowRenovation = ''  # 是否允许装修改造
+        self.otherConditions = ''  # 与出租相关的其他条件
+        self.tenantQualification = ''  # 承租方资格条件
+        self.surveyContact = ''  # 踏勘安排
+        self.isPayTradingMargin = ''  # 交纳交易保证金
+        self.amountPaid = ''  # 交纳金额
+        self.payTime = ''  # 交纳时间
+        self.solveMethod = ''  # 处置方式
+
+        self.informationDisclosure = ''  # 信息披露期
+        self.isPublicationMedia = ''  # 公告是否刊登媒体
+        self.publicationMedia = ''  # 刊登媒体
+
+        self.biddeMethod = ''  # 竞价方式
 
     def __dealFWZL(self):
-        pass
+        self.__initAttribute_FWZL()
+        FWZL(self)
 
     def __dealELSE(self):
         pass

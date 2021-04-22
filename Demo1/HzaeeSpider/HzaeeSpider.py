@@ -32,10 +32,10 @@ class HzaeeSpider():
     def startDownload(self):
         #self.__getCQZR_formal(guoyou=True)
         #self.__getCQZR_informal(guoyou=True)
-        self.__getZCZR(guoyou=True, Type='设备物资')
+        #self.__getZCZR(guoyou=True, Type='设备物资')
         #self.__getQYZZ(guoyou=True)
         #self.__getZS(True)
-        #self.__getFWZL(True)
+        self.__getFWZL(True)
         #self.__getELSE(True)
 
 

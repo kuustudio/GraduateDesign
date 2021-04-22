@@ -33,7 +33,7 @@ def CQZR(obj):
     # 标的企业的注册资本
     obj.registeredCapital = transferorBasicInfo['registeredCapital']
     # 标的企业的实缴资本
-    obj.companyType = transferorBasicInfo['paidCapital']
+    obj.paidCapital = transferorBasicInfo['paidCapital']
     # 标的企业的企业类型
     obj.companyType = transferorBasicInfo['companyType']
     # 标的企业的所属行业
