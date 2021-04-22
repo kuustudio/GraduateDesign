@@ -37,6 +37,22 @@ headers_credit = {
 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
 }
 
+headers_hzaee = {
+'Accept': 'application/json, text/plain, */*',
+'Accept-Encoding': 'gzip, deflate, br',
+'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6,zh-HK;q=0.5',
+'Connection': 'keep-alive',
+# 'Cookie': 'AlteonP=BIMZCRHhg7cL/Uly/GDJVg$$; Hm_lvt_05e3682ca851c2a922f23641393889d4=1617960790,1618219712,1618972159,1618978661; Hm_lpvt_05e3682ca851c2a922f23641393889d4=1618978661',
+'Host': 'www.hzaee.com',
+# 'Referer': 'https://www.hzaee.com/transfer?type=3',
+'sec-ch-ua': '"Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+'sec-ch-ua-mobile': '?0',
+'Sec-Fetch-Dest': 'empty',
+'Sec-Fetch-Mode': 'cors',
+'Sec-Fetch-Site': 'same-origin',
+'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36'
+}
+
 Cookie_init_tyc_list = [
 {
     "domain": ".tianyancha.com",
