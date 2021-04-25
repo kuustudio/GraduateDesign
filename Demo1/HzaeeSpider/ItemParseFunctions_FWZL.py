@@ -1,5 +1,6 @@
 import json
 
+
 def FWZL(obj):
     obj.createDate = obj.info['createDate']  # 信息披露创建时间
     obj.itemId = obj.info['subjectId']  # 标的Id，用于构造Url
@@ -18,10 +19,10 @@ def FWZL(obj):
     json1 = json.loads(txt)
     assert json1['msg'] == 'success'
     data = json1['data']
-    #print(len(data['realEstates']))
+    # print(len(data['realEstates']))
     subjectMainInfoDTO = data['subjectMainInfoDTO']
-    obj.isMortgage = subjectMainInfoDTO['isMortgage'] #标的是否存在抵押情况
-    obj.isPriorityPurchase = subjectMainInfoDTO['isPriorityPurchase'] #权利人是否有意向行使优先购买
+    obj.isMortgage = subjectMainInfoDTO['isMortgage']  # 标的是否存在抵押情况
+    obj.isPriorityPurchase = subjectMainInfoDTO['isPriorityPurchase']  # 权利人是否有意向行使优先购买
 
     subjectRealtorImmovableBasicInfoDTOList = data['subjectRealtorImmovableBasicInfoDTOList']
     if len(subjectRealtorImmovableBasicInfoDTOList) > 0:
@@ -30,10 +31,10 @@ def FWZL(obj):
         obj.useStatus = []
         obj.propertyType = []
         obj.improperPropertyLicenseNumber = []
-        obj.umber = []
+
         obj.purpose = []
         obj.commonSituation = []
-        obj.area = []
+        obj.area2 = []
         obj.natureRights = []
         obj.periodUse = []
         for building in subjectRealtorImmovableBasicInfoDTOList:
@@ -45,7 +46,7 @@ def FWZL(obj):
                 building['improperPropertyLicenseNumber'])  # 不动产权证号
             obj.purpose.append(building['purpose'])  # 用途
             obj.commonSituation.append(building['commonSituation'])  # 共有情况
-            obj.area.append(building['area'])  # 面积
+            obj.area2.append(building['area'])  # 面积
             obj.natureRights.append(building['natureRights'])  # 权利性质
             obj.periodUse.append(building['periodUse'])  # 使用期限
 
@@ -65,7 +66,7 @@ def FWZL(obj):
         obj.landUseCertificateNumber = subjectRealtorOwnershipBasicInfoDTOList['landUseCertificateNumber']  # 土地使用证号
         obj.gentle = subjectRealtorOwnershipBasicInfoDTOList['gentle']  # 地类（用途）
         obj.useRightType = subjectRealtorOwnershipBasicInfoDTOList['useRightType']  # 使用权类型
-        obj.endDate = subjectRealtorOwnershipBasicInfoDTOList['endDate']  # 终止日期
+        obj.endDate2 = subjectRealtorOwnershipBasicInfoDTOList['endDate']  # 终止日期
         obj.rightUseArea = subjectRealtorOwnershipBasicInfoDTOList['rightUseArea']  # 使用权面积
 
         obj.otherDisclosures = ''  # 其他披露事项

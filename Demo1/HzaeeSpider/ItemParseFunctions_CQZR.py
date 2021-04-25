@@ -37,7 +37,7 @@ def CQZR(obj):
     # 标的企业的企业类型
     obj.companyType = transferorBasicInfo['companyType']
     # 标的企业的所属行业
-    obj.industry = transferorBasicInfo['industry']
+    obj.industry2 = transferorBasicInfo['industry']
     # 标的企业的职工人数
     obj.employeNum = transferorBasicInfo['employeNum']
     # 标的企业的统一社会信用代码
@@ -113,49 +113,179 @@ def CQZR(obj):
 
     """转让方基本情况
     """
-    # 转让方名称
-    subjectTransferorLegalBasicInfo = data['subjectTransferorLegalBasicInfoDTOList'][0]
-    obj.transferorName = subjectTransferorLegalBasicInfo['transferorName']
-    # 转让方住所
-    obj.residence = subjectTransferorLegalBasicInfo['residence']
-    # 转让方法人
-    obj.legal = subjectTransferorLegalBasicInfo['legal']
-    # 转让方统一社会信用代码
-    obj.unifiedSocialCreditCode = subjectTransferorLegalBasicInfo['unifiedSocialCreditCode']
-    # 转让方注册资本
-    obj.registeredCapital = subjectTransferorLegalBasicInfo['registeredCapital']
-    # 转让方实收资本
-    obj.paidCapital = subjectTransferorLegalBasicInfo['paidCapital']
-    # 转让方企业类型
-    obj.enterpriseType = subjectTransferorLegalBasicInfo['enterpriseType']
-    # 转让方所属行业
-    obj.industry = subjectTransferorLegalBasicInfo['industry']
-    # 转让方经营规模
-    obj.businessScale = subjectTransferorLegalBasicInfo['businessScale']
-    # 转让方经济性质
-    obj.economicType = subjectTransferorLegalBasicInfo['economicType']
-    # 转让方持有产（股）权比例（%）
-    obj.propertyOwnership = subjectTransferorLegalBasicInfo['propertyOwnership']
-    # 转让方拟转让产（股）权比例（%）
-    obj.transferreProperty = subjectTransferorLegalBasicInfo['transferreProperty']
-    # 产权转让行为决策文件类型
-    obj.decisionType = subjectTransferorLegalBasicInfo['decisionType']
-    # 产权转让行为决策文件名称及文号
-    obj.fileAndDocument = subjectTransferorLegalBasicInfo['fileAndDocument']
-    # 产权转让行为监管机构
-    obj.regulatoryAuthority = subjectTransferorLegalBasicInfo['regulatoryAuthority']
-    # 产权转让行为国家出资企业或主管部门
-    obj.competentDepartment = subjectTransferorLegalBasicInfo['competentDepartment']
-    # 产权转让行为统一社会信用代码
-    obj.unifiedSocialCreditCode2 = subjectTransferorLegalBasicInfo['unifiedSocialCreditCode2']
-    # 产权转让行为批准单位
-    obj.authority = subjectTransferorLegalBasicInfo['authority']
-    # 产权转让行为批准日期
-    obj.approvalDate = subjectTransferorLegalBasicInfo['approvalDate']
-    # 产权转让行为批准文件类型
-    obj.approvedFileType = subjectTransferorLegalBasicInfo['approvedFileType']
-    # 产权转让行为批准文件名称及文号
-    obj.approveFileAndDocument = subjectTransferorLegalBasicInfo['approveFileAndDocument']
+    if len(data['subjectTransferorLegalBasicInfoDTOList']) == 0:
+        assert len(data['subjectTransferorNotLegalBasicInfoDTOList']) > 0
+        subjectTransferorNotLegalBasicInfoDTOList = \
+            data['subjectTransferorNotLegalBasicInfoDTOList']
+        subjectTransferorNotLegalBasicInfoDTOList = data['subjectTransferorNotLegalBasicInfoDTOList'][0]
+        # 转让方名称
+        obj.transferorName = subjectTransferorNotLegalBasicInfoDTOList['transferorName']
+        # 转让方主要经营场所
+        obj.residence2 = subjectTransferorNotLegalBasicInfoDTOList['mainBusinesPremise']
+        # 转让方执行事务合伙人
+        obj.legal = subjectTransferorNotLegalBasicInfoDTOList['principal']
+        # 转让方统一社会信用代码
+        obj.unifiedSocialCreditCode2 = subjectTransferorNotLegalBasicInfoDTOList['unifiedSocialCreditCode']
+        # 转让方企业类型
+        obj.enterpriseType = subjectTransferorNotLegalBasicInfoDTOList['enterpriseType']
+        # 转让方所属行业
+        obj.industry3 = subjectTransferorNotLegalBasicInfoDTOList['industry']
+
+        # 转让方经济性质
+        obj.economicType = subjectTransferorNotLegalBasicInfoDTOList['economicType']
+        # 转让方持有产（股）权比例（%）
+        obj.propertyOwnership = subjectTransferorNotLegalBasicInfoDTOList['propertyOwnership']
+        # 转让方拟转让产（股）权比例（%）
+        obj.transferreProperty = subjectTransferorNotLegalBasicInfoDTOList['transferreProperty']
+        # 产权转让行为决策文件类型
+        obj.decisionType = subjectTransferorNotLegalBasicInfoDTOList['decisionType']
+        # 产权转让行为决策文件名称及文号
+        obj.fileAndDocument2 = subjectTransferorNotLegalBasicInfoDTOList['fileAndDocument']
+        # 产权转让行为监管机构
+        obj.regulatoryAuthority = subjectTransferorNotLegalBasicInfoDTOList['regulatoryAuthority']
+        # 产权转让行为国家出资企业或主管部门
+        obj.competentDepartment = subjectTransferorNotLegalBasicInfoDTOList['competentDepartment']
+        # 产权转让行为统一社会信用代码
+        obj.unifiedSocialCreditCode3 = subjectTransferorNotLegalBasicInfoDTOList['unifiedSocialCreditCode2']
+        # 产权转让行为批准单位
+        obj.authority = subjectTransferorNotLegalBasicInfoDTOList['authority']
+        # 产权转让行为批准日期
+        obj.approvalDate = subjectTransferorNotLegalBasicInfoDTOList['approvalDate']
+        # 产权转让行为批准文件类型
+        obj.approvedFileType = subjectTransferorNotLegalBasicInfoDTOList['approvedFileType']
+        # 产权转让行为批准文件名称及文号
+        obj.approveFileAndDocument = subjectTransferorNotLegalBasicInfoDTOList['approveFileAndDocument']
+
+    elif len(data['subjectTransferorLegalBasicInfoDTOList']) == 1:
+        subjectTransferorLegalBasicInfo = data['subjectTransferorLegalBasicInfoDTOList'][0]
+        # 转让方名称
+        obj.transferorName = subjectTransferorLegalBasicInfo['transferorName']
+        # 转让方住所
+        obj.residence2 = subjectTransferorLegalBasicInfo['residence']
+        # 转让方法人
+        obj.legal = subjectTransferorLegalBasicInfo['legal']
+        # 转让方统一社会信用代码
+        obj.unifiedSocialCreditCode2 = subjectTransferorLegalBasicInfo['unifiedSocialCreditCode']
+        # 转让方注册资本
+        obj.registeredCapital2 = subjectTransferorLegalBasicInfo['registeredCapital']
+        # 转让方实收资本
+        obj.paidCapital2 = subjectTransferorLegalBasicInfo['paidCapital']
+        # 转让方企业类型
+        obj.enterpriseType = subjectTransferorLegalBasicInfo['enterpriseType']
+        # 转让方所属行业
+        obj.industry3 = subjectTransferorLegalBasicInfo['industry']
+        # 转让方经营规模
+        obj.businessScale2 = subjectTransferorLegalBasicInfo['businessScale']
+        # 转让方经济性质
+        obj.economicType = subjectTransferorLegalBasicInfo['economicType']
+        # 转让方持有产（股）权比例（%）
+        obj.propertyOwnership = subjectTransferorLegalBasicInfo['propertyOwnership']
+        # 转让方拟转让产（股）权比例（%）
+        obj.transferreProperty = subjectTransferorLegalBasicInfo['transferreProperty']
+        # 产权转让行为决策文件类型
+        obj.decisionType = subjectTransferorLegalBasicInfo['decisionType']
+        # 产权转让行为决策文件名称及文号
+        obj.fileAndDocument2 = subjectTransferorLegalBasicInfo['fileAndDocument']
+        # 产权转让行为监管机构
+        obj.regulatoryAuthority = subjectTransferorLegalBasicInfo['regulatoryAuthority']
+        # 产权转让行为国家出资企业或主管部门
+        obj.competentDepartment = subjectTransferorLegalBasicInfo['competentDepartment']
+        # 产权转让行为统一社会信用代码
+        obj.unifiedSocialCreditCode3 = subjectTransferorLegalBasicInfo['unifiedSocialCreditCode2']
+        # 产权转让行为批准单位
+        obj.authority = subjectTransferorLegalBasicInfo['authority']
+        # 产权转让行为批准日期
+        obj.approvalDate = subjectTransferorLegalBasicInfo['approvalDate']
+        # 产权转让行为批准文件类型
+        obj.approvedFileType = subjectTransferorLegalBasicInfo['approvedFileType']
+        # 产权转让行为批准文件名称及文号
+        obj.approveFileAndDocument = subjectTransferorLegalBasicInfo['approveFileAndDocument']
+    else:
+        # 转让方名称
+        obj.transferorName = []
+        # 转让方住所
+        obj.residence2 = []
+        # 转让方法人
+        obj.legal = []
+        # 转让方统一社会信用代码
+        obj.unifiedSocialCreditCode2 = []
+        # 转让方注册资本
+        obj.registeredCapital2 = []
+        # 转让方实收资本
+        obj.paidCapital2 = []
+        # 转让方企业类型
+        obj.enterpriseType = []
+        # 转让方所属行业
+        obj.industry3 = []
+        # 转让方经营规模
+        obj.businessScale2 = []
+        # 转让方经济性质
+        obj.economicType = []
+        # 转让方持有产（股）权比例（%）
+        obj.propertyOwnership = []
+        # 转让方拟转让产（股）权比例（%）
+        obj.transferreProperty = []
+        # 产权转让行为决策文件类型
+        obj.decisionType = []
+        # 产权转让行为决策文件名称及文号
+        obj.fileAndDocument2 = []
+        # 产权转让行为监管机构
+        obj.regulatoryAuthority = []
+        # 产权转让行为国家出资企业或主管部门
+        obj.competentDepartment = []
+        # 产权转让行为统一社会信用代码
+        obj.unifiedSocialCreditCode3 = []
+        # 产权转让行为批准单位
+        obj.authority = []
+        # 产权转让行为批准日期
+        obj.approvalDate = []
+        # 产权转让行为批准文件类型
+        obj.approvedFileType = []
+        # 产权转让行为批准文件名称及文号
+        obj.approveFileAndDocument = []
+        for subjectTransferorLegalBasicInfo in data['subjectTransferorLegalBasicInfoDTOList']:
+            # 转让方名称
+            obj.transferorName.append(subjectTransferorLegalBasicInfo['transferorName'])
+            # 转让方住所
+            obj.residence2.append(subjectTransferorLegalBasicInfo['residence'])
+            # 转让方法人
+            obj.legal.append(subjectTransferorLegalBasicInfo['legal'])
+            # 转让方统一社会信用代码
+            obj.unifiedSocialCreditCode2.append(subjectTransferorLegalBasicInfo['unifiedSocialCreditCode'])
+            # 转让方注册资本
+            obj.registeredCapital2.append(subjectTransferorLegalBasicInfo['registeredCapital'])
+            # 转让方实收资本
+            obj.paidCapital2.append(subjectTransferorLegalBasicInfo['paidCapital'])
+            # 转让方企业类型
+            obj.enterpriseType.append(subjectTransferorLegalBasicInfo['enterpriseType'])
+            # 转让方所属行业
+            obj.industry3.append(subjectTransferorLegalBasicInfo['industry'])
+            # 转让方经营规模
+            obj.businessScale2.append(subjectTransferorLegalBasicInfo['businessScale'])
+            # 转让方经济性质
+            obj.economicType.append(subjectTransferorLegalBasicInfo['economicType'])
+            # 转让方持有产（股）权比例（%）
+            obj.propertyOwnership.append(subjectTransferorLegalBasicInfo['propertyOwnership'])
+            # 转让方拟转让产（股）权比例（%）
+            obj.transferreProperty.append(subjectTransferorLegalBasicInfo['transferreProperty'])
+            # 产权转让行为决策文件类型
+            obj.decisionType.append(subjectTransferorLegalBasicInfo['decisionType'])
+            # 产权转让行为决策文件名称及文号
+            obj.fileAndDocument2.append(subjectTransferorLegalBasicInfo['fileAndDocument'])
+            # 产权转让行为监管机构
+            obj.regulatoryAuthority.append(subjectTransferorLegalBasicInfo['regulatoryAuthority'])
+            # 产权转让行为国家出资企业或主管部门
+            obj.competentDepartment.append(subjectTransferorLegalBasicInfo['competentDepartment'])
+            # 产权转让行为统一社会信用代码
+            obj.unifiedSocialCreditCode3.append(subjectTransferorLegalBasicInfo['unifiedSocialCreditCode2'])
+            # 产权转让行为批准单位
+            obj.authority.append(subjectTransferorLegalBasicInfo['authority'])
+            # 产权转让行为批准日期
+            obj.approvalDate.append(subjectTransferorLegalBasicInfo['approvalDate'])
+            # 产权转让行为批准文件类型
+            obj.approvedFileType.append(subjectTransferorLegalBasicInfo['approvedFileType'])
+            # 产权转让行为批准文件名称及文号
+            obj.approveFileAndDocument.append(subjectTransferorLegalBasicInfo['approveFileAndDocument'])
 
     """受让方资格条件
     """

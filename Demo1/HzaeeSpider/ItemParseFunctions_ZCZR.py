@@ -33,7 +33,7 @@ def ZCZR(obj):
         obj.improperPropertyLicenseNumber = realEstates['improperPropertyLicenseNumber']  # 房产不动产权证号
         obj.purpose = realEstates['purpose']  # 房产用途
         obj.commonSituation = realEstates['commonSituation']  # 房产共有情况
-        obj.area = realEstates['area']  # 房产面积
+        obj.area2 = realEstates['area']  # 房产面积
         obj.natureRights = realEstates['natureRights']  # 房产权利性质
         obj.periodUse = realEstates['periodUse']  # 房产使用期限
         obj.otherDisclosures = realEstates['otherDisclosures']  # 其他披露事项
@@ -50,7 +50,7 @@ def ZCZR(obj):
         obj.landUseCertificateNumber = ownershipCertificates['landUseCertificateNumber'] #土地使用证号
 
         obj.commonSituation = ownershipCertificates['commonSituation']  # 房产共有情况
-        obj.area = ownershipCertificates['constructionArea']  # 房产面积
+        obj.area2 = ownershipCertificates['constructionArea']  # 房产面积
 
         obj.useRightType = ownershipCertificates['useRightType']  # 房产使用权类型
         obj.periodUse = ownershipCertificates['endDate']  # 房产使用期限
@@ -109,7 +109,7 @@ def ZCZR(obj):
         obj.unifiedSocialCreditCode = transferorLegalPersons['unifiedSocialCreditCode']  # 转让方统一社会信用代码
         obj.registeredCapital = transferorLegalPersons['registeredCapital']  # 转让方注册资本
         obj.enterpriseType = transferorLegalPersons['enterpriseType']  # 转让方企业类型
-        obj.industry = transferorLegalPersons['industry']  # 转让方所属行业
+        obj.industry2 = transferorLegalPersons['industry']  # 转让方所属行业
         obj.economicType = transferorLegalPersons['economicType']  # 转让方经济性质
         obj.decisionType = transferorLegalPersons['decisionType']  # 转让方内部决策类型
         obj.fileAndDocument = transferorLegalPersons['fileAndDocument']  # 内部决策文件名称及文号
@@ -141,7 +141,7 @@ def ZCZR(obj):
     obj.transfereeQualificate = assetTransferBasicInfo['transfereeQualification']  # 受让方资格条件
     obj.isAccepteTransferConsortium = assetTransferBasicInfo['isAccepteTransferConsortium']  # 受让方是否接收联合体受让
 
-    obj.subjectName = assetTransferBasicInfo['subjectName']  # 标的名称
+    obj.subjectName2 = assetTransferBasicInfo['subjectName']  # 标的名称
     obj.transferReservePrice = assetTransferBasicInfo['transferReservePrice']  # 转让低价
     obj.isSetReservePrice = assetTransferBasicInfo['isSetReservePrice']  # 是否设置保留价
     obj.paymentRequest = assetTransferBasicInfo['paymentRequest']  # 付款支付方式
