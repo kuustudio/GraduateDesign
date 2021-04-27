@@ -40,7 +40,9 @@ class WXSpider():
             'ie': 'utf8'
         }
         self.__pages = []
+        self.__dataframe = pd.DataFrame(columns=['标题', '简介', '公众号名', '文章内容'])
         self.__getAllPages()
+        self.__dataframe.to_csv(str(self.__pageNum) + '.csv', encoding='utf-8-sig')
 
     def __getPage(self, pageNum = 1):
         self.__params['page'] = str(pageNum)
@@ -67,13 +69,13 @@ class WXSpider():
             self.__pageNum = math.ceil(int(num) / 10)
             print('一共：', self.__pageNum, '页')
 
-        page = WXPage(html, pageNum)
+        page = WXPage(html, pageNum, dataframe=self.__dataframe)
         self.__pages.append(page)
 
     def __getAllPages(self):
         self.__getPage(1)
 
-        for i in range(2, self.__pageNum):
+        for i in range(2, 10):
             print('第', i, '页：')
             self.__getPage(i)
 
