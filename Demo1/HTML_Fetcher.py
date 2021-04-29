@@ -58,7 +58,7 @@ class HTML_Fetcher():
         获取网页HTML TEXT
     """
 
-    def get_html(self, url, count, useProxy=True, data=None):
+    def get_html(self, url, count, useProxy=True, data=None, returnType = 'text'):
         if self.name == '天眼查':
             assert len(self.cookie) > 0
 
@@ -104,7 +104,7 @@ class HTML_Fetcher():
                     self.__setProxy(HTML_Fetcher.proxyManger.getProxyIP_HTTP(),
                                     HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
 
-                return self.get_html(url, count + 1, useProxy, data)
+                return self.get_html(url, count + 1, useProxy, data, returnType)
 
             if response.status_code is not 200:
                 print("请求完毕，但响应不正常， 响应码为：" + str(response.status_code))
@@ -112,10 +112,10 @@ class HTML_Fetcher():
                     self.__setProxy(HTML_Fetcher.proxyManger.getProxyIP_HTTP(),
                                     HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
 
-                return self.get_html(url, count + 1, useProxy, data)
+                return self.get_html(url, count + 1, useProxy, data, returnType)
 
             else:
-                return response.text
+                return response.text if returnType == 'text' else response.content
 
         else:
             # POST请求，暂时用不到

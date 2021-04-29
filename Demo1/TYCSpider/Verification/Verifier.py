@@ -1,4 +1,4 @@
-from Demo1.TYCSpider.Verification.Chaojiying import Chaojiying_Client
+from Demo1.Chaojiying import Chaojiying_Client
 from Demo1.TYCSpider.Verification.verificationSettings import *
 from Demo1.config import *
 import Demo1.config as config
