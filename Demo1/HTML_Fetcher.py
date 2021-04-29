@@ -119,6 +119,9 @@ class HTML_Fetcher():
 
         else:
             # POST请求，暂时用不到
-            return ''
+            assert self.request_type == 'POST'
+            assert data is not None
+            response = requests.post(url, data=data, headers = self.headers)
+            return response.text if returnType == 'text' else response.content
 
 

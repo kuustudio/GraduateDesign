@@ -1,11 +1,13 @@
-from Demo1.HTML_Fetcher import *
 from Demo1.ZXGKSpider.Verifier import *
+from Demo1.ZXGKSpider.PeopleInfo_ZX import *
+import json
 
 class PeopleSpider():
     '''
         被执行人爬虫
     '''
     def __init__(self):
+        self.__url = 'http://zxgk.court.gov.cn/zhzxgk/searchZhcx.do'
         self.__PostHeader = {
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Encoding': 'gzip, deflate',
@@ -20,7 +22,9 @@ class PeopleSpider():
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36',
             'X-Requested-With': 'XMLHttpRequest'
         }
-        self.__html_fetcher = HTML_Fetcher(name='被执行人', headers=self.__PostHeader)
+        self.__html_fetcher = HTML_Fetcher(name='被执行人',
+                                           headers=self.__PostHeader,
+                                           request_type='POST')
         self.__form_data = {
             'pName': '', #被执行人名称
             'pCardNum': '', #身份证号 / 社会信用代码
@@ -32,3 +36,49 @@ class PeopleSpider():
             'currentPage': '1' #default : 1
         }
 
+        self.__verifier = ZXGKVerifier()
+
+        self.__peopleInfos = {}
+
+    def search(self, pName, pCardNum = ''):
+        self.__form_data['pName'] = pName
+        self.__form_data['pCardNum'] = pCardNum
+        (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1)
+        self.__form_data['captchaId'] = captchaId
+        self.__form_data['pCode'] = pCode
+        print('获取第 1 页，被执行人：' + pName + ' 的信息')
+        data = self.__html_fetcher.get_html(url=self.__url,
+                                            count=1,
+                                            useProxy=False,
+                                            data=self.__form_data)
+
+        json1 = json.loads(data)
+        dataDict = json1[0]
+        totalPageNum = dataDict['totalPage']
+        result = dataDict['result']
+
+        if pName not in self.__peopleInfos.keys():
+            self.__peopleInfos[pName] = []
+
+        for each in result:
+            peopleInfo = PeopleInfo(each)
+            self.__peopleInfos[pName].append(peopleInfo)
+
+        for i in range(2, totalPageNum + 1):
+            self.__form_data['currentPage'] = str(i)
+            print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息')
+            data = self.__html_fetcher.get_html(url=self.__url,
+                                                count=1,
+                                                useProxy=False,
+                                                data=self.__form_data)
+            json1 = json.loads(data)
+            dataDict = json1[0]
+            result = dataDict['result']
+            for each in result:
+                peopleInfo = PeopleInfo(each)
+                self.__peopleInfos[pName].append(peopleInfo)
+        # print(data)
+
+if __name__ == '__main__':
+    peopleSpider = PeopleSpider()
+    peopleSpider.search('王刚')

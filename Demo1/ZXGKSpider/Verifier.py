@@ -1,5 +1,7 @@
 from Demo1.HTML_Fetcher import *
 import re
+from Demo1.Chaojiying import *
+from Demo1.ZXGKSpider.verificationSettings import *
 
 class ZXGKVerifier:
     def __init__(self):
@@ -18,7 +20,11 @@ class ZXGKVerifier:
 
         self.__html_fetcher = HTML_Fetcher(name='执行信息公开网验证码', headers=self.__getVerifyPngHeader)
 
-    def getVerifier(self, type = 1):
+        self.__chaoJiYing = Chaojiying_Client(username=CJY_USERNAME,
+                                              password=CJY_PASSWORD,
+                                              soft_id=CJY_SOFT_ID)
+
+    def __getVerifyPng(self, type = 1):
         '''
         获取验证码
         :param type: type为1时，代表被执行人查询，type为2时，代表司法拍卖查询
@@ -36,18 +42,26 @@ class ZXGKVerifier:
         #print(reSearchGroup[1])
 
         verifyCodeUrl = self.__verifierUrl + reSearchGroup[0]
-        # print(verifyCodeUrl)
+        capchaInfo = reSearchGroup[1]
+        self.__capchaId = capchaInfo[10 : capchaInfo.find('&')]
+        self.__randomNum = capchaInfo[capchaInfo.find('random') + 7 : ]
 
         png = self.__html_fetcher.get_html(verifyCodeUrl,
                                            count=1,
                                            useProxy=False,
                                            returnType='content')
-        # with open('3.png', 'wb') as f:
+        # with open('5.png', 'wb') as f:
         #     f.write(png)
         return png
 
+    def getVerifyInfo(self, type = 1):
+        png = self.__getVerifyPng(type = type)
+        response = self.__chaoJiYing.PostPic(png, IMG_TYPE_GETVALUE)
+        verifyValue = response['pic_str']
+        return self.__capchaId, self.__randomNum, verifyValue
 
-
-if __name__ == '__main__':
-    verifier = ZXGKVerifier()
-    verifier.getVerifier(2)
+#if __name__ == '__main__':
+#    verifier = ZXGKVerifier()
+#    ret = verifier.getVerifyInfo(type=2)
+#    print(type(ret))
+#    print(ret)
