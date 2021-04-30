@@ -77,7 +77,18 @@ class PeopleSpider():
             '被执行人-执行法院',
             '被执行人-立案时间',
             '被执行人-案号',
-            '被执行人-执行标的'
+            '被执行人-执行标的',
+            '失信企业四类人信息-被执行人姓名/名称',
+            '失信企业四类人信息-身份证号码/组织机构代码',
+            '失信企业四类人信息-法定代表人',
+            '失信企业四类人信息-执行法院',
+            '失信企业四类人信息-省份',
+            '失信企业四类人信息-立案时间',
+            '失信企业四类人信息-案号',
+            '失信企业四类人信息-生效法律文书确定的义务',
+            '失信企业四类人信息-被执行人的履行情况',
+            '失信企业四类人信息-失信被执行人行为具体情形',
+            '失信企业四类人信息-发布时间'
         ]
 
         self.__dataFrame = pd.DataFrame(columns=self.__dataFrameColumns)
@@ -108,15 +119,13 @@ class PeopleSpider():
 
         for i in range(2, totalPageNum + 1):
             self.__form_data['currentPage'] = str(i)
-            print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息')
+            print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息。' + '共 ' + str(totalPageNum) + ' 页。')
             data = self.__html_fetcher.get_html(url=self.__url,
                                                 count=1,
                                                 useProxy=False,
                                                 data=self.__form_data)
-            try:
-                json1 = json.loads(data)
-            except:
-                print(data)
+
+            json1 = json.loads(data)
             dataDict = json1[0]
             result = dataDict['result']
             for each in result:
@@ -124,17 +133,17 @@ class PeopleSpider():
                 self.__peopleInfos[pName].append(peopleInfo)
         # print(data)
 
-    def infoSave2Csv(self):
-        self.__dataFrame.to_csv('res.csv', encoding='utf-8-sig')
+    def infoSave2Csv(self, name):
+        self.__dataFrame.to_csv(name + '.csv', encoding='utf-8-sig', index=False)
 
 if __name__ == '__main__':
     peopleSpider = PeopleSpider()
-    #peopleSpider.search('侯波')
+    #peopleSpider.search('谢建华')
     with open('../HzaeeSpider/name.txt') as f:
         a = f.read().split('\n')
         nameSet = set(a)
 
     for name in nameSet:
         peopleSpider.search(name)
-        peopleSpider.infoSave2Csv()
+        peopleSpider.infoSave2Csv(name)
 

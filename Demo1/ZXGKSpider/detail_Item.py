@@ -18,8 +18,37 @@ class DetailItem():
             self.__deal_XZXFRY()
         elif title == '被执行人':
             self.__deal_BZXR()
+        elif title == '失信企业四类人信息':
+            self.__deal_SXQYSLRXX()
         else:
             print(title)
+
+    def __deal_SXQYSLRXX(self):
+        '''
+        处理失信企业四类人信息
+        :return:
+        '''
+        items = self.__table.find_all('tr')
+        for item in items:
+            itemText = item.text
+            line = itemText.split('：')
+            key = line[0].strip()
+            value = line[1].strip()
+            self.__infoDict[key] = value
+
+        columnList = self.__dataFrame.columns.values.tolist()
+
+        for i in range(0, len(columnList)):
+            if self.__title == columnList[i][0: columnList[i].find('-')]:
+                tableKey = columnList[i]
+                selfKey = tableKey[tableKey.find('-') + 1:]
+                if selfKey in self.__infoDict.keys():
+                    tableValue = self.__infoDict[selfKey]
+                else:
+                    tableValue = '无信息'
+                self.dataFrameList.append(tableValue)
+            else:
+                self.dataFrameList.append('')
 
     def __deal_SXBZXR(self):
         '''

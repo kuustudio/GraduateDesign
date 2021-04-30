@@ -77,4 +77,7 @@ class PeopleInfo():
                     assert not (len(wholeFrameList[i]) > 1 and len(itemFrameList[i]) > 1)
                     if len(wholeFrameList[i]) == 0 and len(itemFrameList[i]) > 1:
                         wholeFrameList[i] = itemFrameList[i]
-        self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
+        try:
+            self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
+        except:
+            self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
