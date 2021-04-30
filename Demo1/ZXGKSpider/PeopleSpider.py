@@ -13,7 +13,7 @@ class PeopleSpider():
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6,zh-HK;q=0.5',
             'Connection': 'keep-alive',
-            'Content-Length': '284',
+            # 'Content-Length': '284',
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             # 'Cookie': 'JSESSIONID=E9C61273BEE39B1A7789FBE075E3AD45; UM_distinctid=1789ace0eca5b-0f964b0224f8c7-c781f38-144000-1789ace0ecb22e; _gscu_15322769=18972572ixmhz018; SESSION=e68c7979-c0dc-4288-878d-dcd7260584a5; _gscbrs_15322769=1; Hm_lvt_d59e2ad63d3a37c53453b996cb7f8d4e=1619357881,1619358020,1619537171,1619665618; Hm_lpvt_d59e2ad63d3a37c53453b996cb7f8d4e=1619665618; _gscs_15322769=19665617d3m7d317|pv:5',
             'Host': 'zxgk.court.gov.cn',
@@ -46,7 +46,7 @@ class PeopleSpider():
         (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1)
         self.__form_data['captchaId'] = captchaId
         self.__form_data['pCode'] = pCode
-        print('获取第 1 页，被执行人：' + pName + ' 的信息')
+        #print('获取第 1 页，被执行人：' + pName + ' 的信息')
         data = self.__html_fetcher.get_html(url=self.__url,
                                             count=1,
                                             useProxy=False,
@@ -61,12 +61,12 @@ class PeopleSpider():
             self.__peopleInfos[pName] = []
 
         for each in result:
-            peopleInfo = PeopleInfo(each)
+            peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher)
             self.__peopleInfos[pName].append(peopleInfo)
 
         for i in range(2, totalPageNum + 1):
             self.__form_data['currentPage'] = str(i)
-            print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息')
+            #print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息')
             data = self.__html_fetcher.get_html(url=self.__url,
                                                 count=1,
                                                 useProxy=False,
@@ -75,7 +75,7 @@ class PeopleSpider():
             dataDict = json1[0]
             result = dataDict['result']
             for each in result:
-                peopleInfo = PeopleInfo(each)
+                peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher)
                 self.__peopleInfos[pName].append(peopleInfo)
         # print(data)
 
