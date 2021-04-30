@@ -40,13 +40,55 @@ class PeopleSpider():
 
         self.__peopleInfos = {}
 
+        self.__dataFrameColumns = [
+            '终本案件-案号',
+            '终本案件-被执行人姓名/名称',
+            '终本案件-性别',
+            '终本案件-身份证号码/组织机构代码',
+            '终本案件-执行法院',
+            '终本案件-立案时间',
+            '终本案件-终本日期',
+            '终本案件-执行标的',
+            '终本案件-未履行金额',
+            '失信被执行人-被执行人姓名/名称',
+            '失信被执行人-性别',
+            '失信被执行人-身份证号码/组织机构代码',
+            '失信被执行人-执行法院',
+            '失信被执行人-省份',
+            '失信被执行人-执行依据文号',
+            '失信被执行人-立案时间',
+            '失信被执行人-案号',
+            '失信被执行人-做出执行依据单位',
+            '失信被执行人-生效法律文书确定的义务',
+            '失信被执行人-被执行人的履行情况',
+            '失信被执行人-失信被执行人行为具体情形',
+            '失信被执行人-发布时间',
+            '限制消费人员-限制消费人员姓名',
+            '限制消费人员-性别',
+            '限制消费人员-身份证号码/组织机构代码',
+            '限制消费人员-执行法院',
+            '限制消费人员-省份',
+            '限制消费人员-案号',
+            '限制消费人员-立案时间',
+            '限制消费人员-查看限消令',
+            '被执行人-被执行人姓名/名称',
+            '被执行人-身份证号码/组织机构代码',
+            '被执行人-性别',
+            '被执行人-执行法院',
+            '被执行人-立案时间',
+            '被执行人-案号',
+            '被执行人-执行标的'
+        ]
+
+        self.__dataFrame = pd.DataFrame(columns=self.__dataFrameColumns)
+
     def search(self, pName, pCardNum = ''):
         self.__form_data['pName'] = pName
         self.__form_data['pCardNum'] = pCardNum
         (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1)
         self.__form_data['captchaId'] = captchaId
         self.__form_data['pCode'] = pCode
-        #print('获取第 1 页，被执行人：' + pName + ' 的信息')
+        print('获取第 1 页，被执行人：' + pName + ' 的信息')
         data = self.__html_fetcher.get_html(url=self.__url,
                                             count=1,
                                             useProxy=False,
@@ -61,24 +103,38 @@ class PeopleSpider():
             self.__peopleInfos[pName] = []
 
         for each in result:
-            peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher)
+            peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher, self.__dataFrame)
             self.__peopleInfos[pName].append(peopleInfo)
 
         for i in range(2, totalPageNum + 1):
             self.__form_data['currentPage'] = str(i)
-            #print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息')
+            print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息')
             data = self.__html_fetcher.get_html(url=self.__url,
                                                 count=1,
                                                 useProxy=False,
                                                 data=self.__form_data)
-            json1 = json.loads(data)
+            try:
+                json1 = json.loads(data)
+            except:
+                print(data)
             dataDict = json1[0]
             result = dataDict['result']
             for each in result:
-                peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher)
+                peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher, self.__dataFrame)
                 self.__peopleInfos[pName].append(peopleInfo)
         # print(data)
 
+    def infoSave2Csv(self):
+        self.__dataFrame.to_csv('res.csv', encoding='utf-8-sig')
+
 if __name__ == '__main__':
     peopleSpider = PeopleSpider()
-    peopleSpider.search('王刚')
+    #peopleSpider.search('侯波')
+    with open('../HzaeeSpider/name.txt') as f:
+        a = f.read().split('\n')
+        nameSet = set(a)
+
+    for name in nameSet:
+        peopleSpider.search(name)
+        peopleSpider.infoSave2Csv()
+

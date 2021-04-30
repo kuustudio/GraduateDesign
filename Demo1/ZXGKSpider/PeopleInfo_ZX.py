@@ -1,7 +1,9 @@
 from Demo1.ZXGKSpider.detail_Item import *
+import json
+from bs4 import BeautifulSoup
 
 class PeopleInfo():
-    def __init__(self, infoDict, captchaId, verifyCode, htmlFetcher):
+    def __init__(self, infoDict, captchaId, verifyCode, htmlFetcher, dataFrame):
         self.__infoDict= infoDict
         self.__caseCode = infoDict['caseCode']
         self.__name = infoDict['pname']
@@ -15,6 +17,8 @@ class PeopleInfo():
         # print((self.__name, self.__caseCode, self.__caseCreateTime))
 
         self.__htmlFetcher = htmlFetcher
+
+        self.__dataFrame = dataFrame
 
         self.__getDetailPage()
 
@@ -59,4 +63,18 @@ class PeopleInfo():
 
         for table in tables:
             title = table.find('div', class_ = 'col-lg-12 col-md-12 col-sm-12 bg-title').text
-            self.__detailItems.append(DetailItem(table = table, title = title))
+            self.__detailItems.append(
+                DetailItem(table = table, title = title, dataFrame = self.__dataFrame))
+
+        wholeFrameList = []
+        for detailItem in self.__detailItems:
+            itemFrameList = detailItem.dataFrameList
+            if len(wholeFrameList) == 0:
+                for frameValue in itemFrameList:
+                    wholeFrameList.append(frameValue)
+            else:
+                for i in range(0, len(wholeFrameList)):
+                    assert not (len(wholeFrameList[i]) > 1 and len(itemFrameList[i]) > 1)
+                    if len(wholeFrameList[i]) == 0 and len(itemFrameList[i]) > 1:
+                        wholeFrameList[i] = itemFrameList[i]
+        self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
