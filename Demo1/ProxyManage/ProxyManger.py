@@ -7,7 +7,12 @@ class ProxyManger():
         self.manager = ProxyManagerZhima()
 
     def getProxyIP_HTTP(self):
-        return self.manager.getIP_HTTP()
+        http_proxy = self.manager.getIP_HTTP()
+        if '{' in http_proxy:
+            time.sleep(0.5)
+            return self.getProxyIP_HTTP()
+        else:
+            return http_proxy
 
     def getProxyIP_HTTPS(self):
         https_proxy = self.manager.getIP_HTTPS()

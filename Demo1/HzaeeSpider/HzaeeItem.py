@@ -3,6 +3,9 @@ from Demo1.HzaeeSpider.ItemParseFunctions_CQZR import *
 from Demo1.HzaeeSpider.ItemParseFunctions_ZCZR import *
 from Demo1.HzaeeSpider.ItemParseFunctions_FWZL import *
 import pandas as pd
+from Demo1.HzaeeSpider.SQL_EXEC.MYSQL_EXEC_Hzaee import *
+from pymysql.err import InternalError
+from bs4 import BeautifulSoup
 
 class HzaeeItem():
     def __init__(self, guoyou, infoDict, htmlFetcher, ItemType = 1):
@@ -291,7 +294,12 @@ class HzaeeItem():
     def __dealELSE(self):
         pass
 
-    def item2csv(self, dataframe = None):
+    def item2csv_sql(self, dataframe = None, mode = 1):
+        '''
+        :param dataframe:
+        :param mode: mode = 1:转sql， mode = 2:转csv
+        :return:
+        '''
         attr2chinese = {
             'createDate' : '信息披露创建时间',
             'itemId' : '标的Id，用于构造Url',
@@ -440,6 +448,14 @@ class HzaeeItem():
             'allowRenovation': '是否允许装修改造',
             'tenantQualification': '承租方资格条件'
         }
+
+        #if mode == 1 and dataframe is None:
+        #    createDatabase('hzaee')
+        #    try:
+        #        createHzaeeTable()
+        #    except InternalError:
+        #        print('表已存在！')
+
         if dataframe is None:
             dataframe = pd.DataFrame(columns = attr2chinese.values())
 
@@ -453,8 +469,14 @@ class HzaeeItem():
 
         attrlist = []
         for item in dataframe.columns:
+            if type(name2attr[item]).__name__ == 'str' and \
+                    ('</' in name2attr[item] or '<p>' in name2attr[item]):
+                soup = BeautifulSoup(name2attr[item], 'html.parser')
+                name2attr[item] = soup.text
             attrlist.append(name2attr[item])
 
-        dataframe.loc[dataframe.index.size] = attrlist
+        if mode == 2:
+            dataframe.loc[dataframe.index.size] = attrlist
+        else:
+            insertItem(tuple(attrlist))
         #print(1)
-        return dataframe

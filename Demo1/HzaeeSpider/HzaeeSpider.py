@@ -88,7 +88,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__CQZRs_formal.append(hzaeeItem)
 
         if info['totalPage'] > 1:
@@ -121,7 +121,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, ItemType=2, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__CQZRs_informal.append(hzaeeItem)
 
         if info['totalPage'] > 1:
@@ -154,7 +154,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, ItemType=3, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__ZCZRs.append(hzaeeItem)
 
         if info['totalPage'] > 1:
@@ -185,7 +185,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, ItemType=4, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__QYZZs.append(hzaeeItem)
 
         if info['totalPage'] > 1:
@@ -216,7 +216,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, ItemType=5, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__FWZLs.append(hzaeeItem)
 
         if info['totalPage'] > 1:
@@ -250,7 +250,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, ItemType=6, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__ZSs.append(hzaeeItem)
 
         if info['total'] > 15:
@@ -287,7 +287,7 @@ class HzaeeSpider():
         currentPageInfo = info['list']
         for item in currentPageInfo:
             hzaeeItem = HzaeeItem(guoyou, item, ItemType=7, htmlFetcher=self.__htmlFetcher)
-            self.__dataFrame = hzaeeItem.item2csv(self.__dataFrame)
+            self.__dataFrame = hzaeeItem.item2csv_sql(self.__dataFrame)
             self.__ELSEs.append(hzaeeItem)
 
         if info['total'] > 15:
