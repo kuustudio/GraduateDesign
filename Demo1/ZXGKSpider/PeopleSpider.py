@@ -1,6 +1,7 @@
 from Demo1.ZXGKSpider.Verifier import *
 from Demo1.ZXGKSpider.PeopleInfo_ZX import *
 import json
+import os
 
 class PeopleSpider():
     '''
@@ -93,44 +94,65 @@ class PeopleSpider():
 
         self.__dataFrame = pd.DataFrame(columns=self.__dataFrameColumns)
 
-    def search(self, pName, pCardNum = ''):
-        self.__form_data['pName'] = pName
-        self.__form_data['pCardNum'] = pCardNum
-        (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1)
-        self.__form_data['captchaId'] = captchaId
-        self.__form_data['pCode'] = pCode
-        print('获取第 1 页，被执行人：' + pName + ' 的信息')
+    def search(self, pName, pCardNum = '', currentPage = 1, exceptionFlag = False, useProxy = False):
+        self.__form_data['currentPage'] = str(currentPage)
+
+        if currentPage == 1:
+            self.__form_data['pName'] = pName
+            self.__form_data['pCardNum'] = pCardNum
+
+        if currentPage == 1 or exceptionFlag == True:
+            (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1, useProxy)
+            self.__form_data['captchaId'] = captchaId
+            self.__form_data['pCode'] = pCode
+        else:
+            (captchaId, pCode) = (self.__form_data['captchaId'], self.__form_data['pCode'])
+
         data = self.__html_fetcher.get_html(url=self.__url,
                                             count=1,
-                                            useProxy=False,
+                                            useProxy=useProxy,
                                             data=self.__form_data)
 
-        json1 = json.loads(data)
-        dataDict = json1[0]
-        totalPageNum = dataDict['totalPage']
-        result = dataDict['result']
+        try:
+            json1 = json.loads(data)
+        except:
+            try:
+                json1 = json.loads(data)
+            except:
+                print('爬取过程中出现错误！[json & data & totalPageNum & result]')
+                return self.search(pName, pCardNum, currentPage, exceptionFlag = True, useProxy = useProxy)
+        try:
+            dataDict = json1[0]
+            totalPageNum = dataDict['totalPage']
+            result = dataDict['result']
+        except:
+            print('爬取过程中出现错误！[dataDict & totalPageNum & result]')
+            return self.search(pName, pCardNum, currentPage, exceptionFlag=True, useProxy=useProxy)
+
+
+        print('获取第 ' + str(currentPage) + ' 页，被执行人：' + pName + ' 的信息。' + '共 ' + str(totalPageNum) + ' 页。')
 
         if pName not in self.__peopleInfos.keys():
+            assert currentPage == 1
             self.__peopleInfos[pName] = []
 
         for each in result:
-            peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher, self.__dataFrame)
+            try:
+                peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher, self.__dataFrame, useProxy = useProxy)
+            except:
+                return self.search(pName, pCardNum, currentPage, exceptionFlag=True, useProxy=useProxy)
             self.__peopleInfos[pName].append(peopleInfo)
 
-        for i in range(2, totalPageNum + 1):
-            self.__form_data['currentPage'] = str(i)
-            print('获取第 '+ str(i) + ' 页，被执行人：' + pName + ' 的信息。' + '共 ' + str(totalPageNum) + ' 页。')
-            data = self.__html_fetcher.get_html(url=self.__url,
-                                                count=1,
-                                                useProxy=False,
-                                                data=self.__form_data)
+        if totalPageNum > 1:
+            if currentPage == totalPageNum:
+                return True
+            else:
+                return self.search(pName, pCardNum, currentPage + 1,
+                            exceptionFlag = False,
+                            useProxy = useProxy)
+        else:
+            return True
 
-            json1 = json.loads(data)
-            dataDict = json1[0]
-            result = dataDict['result']
-            for each in result:
-                peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher, self.__dataFrame)
-                self.__peopleInfos[pName].append(peopleInfo)
         # print(data)
 
     def infoSave2Csv(self, name):
@@ -139,11 +161,21 @@ class PeopleSpider():
 if __name__ == '__main__':
     peopleSpider = PeopleSpider()
     #peopleSpider.search('谢建华')
+    path = os.getcwd()
+
     with open('../HzaeeSpider/name.txt') as f:
         a = f.read().split('\n')
         nameSet = set(a)
 
     for name in nameSet:
-        peopleSpider.search(name)
-        peopleSpider.infoSave2Csv(name)
+        hasFlag = False
+        for i in os.listdir(path):
+            if '.csv' in i:
+                fileName = i[0: i.find('.')]
+                if name == fileName:
+                    hasFlag = True
+                    break
+        if not hasFlag:
+            peopleSpider.search(name, useProxy=True)
+            peopleSpider.infoSave2Csv(name)
 

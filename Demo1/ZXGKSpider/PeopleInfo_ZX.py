@@ -1,15 +1,17 @@
 from Demo1.ZXGKSpider.detail_Item import *
 import json
 from bs4 import BeautifulSoup
+import time
 
 class PeopleInfo():
-    def __init__(self, infoDict, captchaId, verifyCode, htmlFetcher, dataFrame):
+    def __init__(self, infoDict, captchaId, verifyCode, htmlFetcher, dataFrame, useProxy = False):
         self.__infoDict= infoDict
         self.__caseCode = infoDict['caseCode']
         self.__name = infoDict['pname']
         self.__captchaId = captchaId
         self.__verifyCode = verifyCode
         self.__detailItems = []
+        self.__useProxy = useProxy
 
         json1 = json.loads(infoDict['jsonObject'])
         self.__caseCreateTime = json1['caseCreateTime']
@@ -20,7 +22,10 @@ class PeopleInfo():
 
         self.__dataFrame = dataFrame
 
-        self.__getDetailPage()
+        if not self.__getDetailPage():
+            print('获取新Item出现错误')
+            time.sleep(15)
+            raise SyntaxError
 
     def __getDetailPage(self):
         self.__url = 'http://zxgk.court.gov.cn/zhzxgk/detailZhcx.do'
@@ -51,10 +56,10 @@ class PeopleInfo():
 
         page = self.__htmlFetcher.get_html(url=self.__url,
                                             count=1,
-                                            useProxy=False,
+                                            useProxy=self.__useProxy,
                                             data=self.__params)
         # print(page)
-        self.__parsePage(page)
+        return self.__parsePage(page)
 
     def __parsePage(self, pageHtml):
         soup = BeautifulSoup(pageHtml, 'html.parser')
@@ -79,5 +84,10 @@ class PeopleInfo():
                         wholeFrameList[i] = itemFrameList[i]
         try:
             self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
+            return True
         except:
-            self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
+            try:
+                self.__dataFrame.loc[self.__dataFrame.index.size] = wholeFrameList
+                return True
+            except:
+                return False

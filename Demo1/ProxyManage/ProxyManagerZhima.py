@@ -62,9 +62,11 @@ class ProxyManagerZhima():
         else:
             # 现在的代理出了问题
             # 先找现有的，在list池中的ip，把过期的、危险的ip去掉
+            newList = []
             for i in range(0, len(self.proxies_http)):
-                if self.proxies_http[i].hasDead() or self.proxies_http[i].indanger():
-                    del self.proxies_http[i]
+                if not (self.proxies_http[i].hasDead() or self.proxies_http[i].indanger()):
+                    newList.append(self.proxies_http[i])
+            self.proxies_http = newList
 
             if len(self.proxies_http) == 0:
                 self.nowProxy_http = None
@@ -73,6 +75,9 @@ class ProxyManagerZhima():
             else:
                 if (len(self.proxies_http) == 1 and
                         self.proxies_http[0].__eq__(self.nowProxy_http)):
+                    self.nowProxy_http = None
+                    return self.getIP_HTTP()
+                elif len(self.proxies_http) < 5:
                     self.nowProxy_http = None
                     return self.getIP_HTTP()
                 else:
@@ -107,11 +112,13 @@ class ProxyManagerZhima():
         else:
             # 现在的代理出了问题
             # 先找现有的，在list池中的ip，把过期的、危险的ip去掉
+            newList = []
             for i in range(0, len(self.proxies_https)):
-                if self.proxies_https[i].hasDead() or \
+                if not (self.proxies_https[i].hasDead() or \
                         self.proxies_https[i].indanger() or \
-                        ('{' in self.proxies_https[i].address):
-                    del self.proxies_https[i]
+                        ('{' in self.proxies_https[i].address)):
+                    newList.append(self.proxies_https[i])
+            self.proxies_https = newList
 
             if len(self.proxies_https) == 0:
                 self.nowProxy_https = None
@@ -122,12 +129,15 @@ class ProxyManagerZhima():
                         self.proxies_https[0].__eq__(self.nowProxy_https)):
                     self.nowProxy_https = None
                     return self.getIP_HTTPS(hasGetHTTP=False)
+                elif len(self.proxies_https) < 5:
+                    self.nowProxy_https = None
+                    return self.getIP_HTTPS(hasGetHTTP=False)
                 else:
                     for proxy in self.proxies_https:
                         if not proxy.__eq__(self.nowProxy_https):
                             self.nowProxy_https = proxy
                             break
-                    print('更换代理IP为 : ' + self.nowProxy_https.address)
+                    #print('更换代理IP为 : ' + self.nowProxy_https.address)
                     return self.nowProxy_https.address
 
 

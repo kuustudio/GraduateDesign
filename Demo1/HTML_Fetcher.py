@@ -58,14 +58,15 @@ class HTML_Fetcher():
         获取网页HTML TEXT
     """
 
-    def get_html(self, url, count, useProxy=True, data=None, returnType = 'text'):
+    def get_html(self, url, count, useProxy=True, data=None, returnType = 'text', printInfo = True):
         if self.name == '天眼查':
             assert len(self.cookie) > 0
 
         if count > HTML_Fetcher.html_retries:
-            print("重试超过%d次：建议停机检查：" % HTML_Fetcher.html_retries,
-                  url,
-                  "目前正在使用代理" if useProxy else "目前不使用代理")
+            if printInfo:
+                print("重试超过%d次：建议停机检查：" % HTML_Fetcher.html_retries,
+                      url,
+                      "目前正在使用代理" if useProxy else "目前不使用代理")
             return ''
 
         # 检查是否先设置了代理
@@ -75,10 +76,12 @@ class HTML_Fetcher():
                                 HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
             assert (len(self.proxy_http) > 0)
             assert (len(self.proxy_https) > 0)
-            print(("爬取此网页：" if data is None else "携带参数请求此URL："), url, "次数：", count, "时间：", time.time(), " 代理IP：",
-                  self.proxy_https if 'https' in url else self.proxy_http)
+            if printInfo:
+                print(("爬取此网页：" if data is None else "携带参数请求此URL："), url, "次数：", count, "时间：", time.time(), " 代理IP：",
+                      self.proxy_https if 'https' in url else self.proxy_http)
         else:
-            print(("爬取此网页：" if data is None else "携带参数请求此URL："), url, "次数：", count, "时间：", time.time(), "不使用代理IP")
+            if printInfo:
+                print(("爬取此网页：" if data is None else "携带参数请求此URL："), url, "次数：", count, "时间：", time.time(), "不使用代理IP")
 
         if (self.request_type == 'GET'):
             try:
@@ -98,30 +101,60 @@ class HTML_Fetcher():
                                                 timeout = HTML_Fetcher.request_timeout,
                                                 params = data)
             except BaseException:
-                print("请求过程中，异常发生")
+                if printInfo:
+                    print("请求过程中，异常发生")
                 # 这里没有对异常情况作具体处理，只是直接换代理IP 重新请求 就完事昂
                 if useProxy:
                     self.__setProxy(HTML_Fetcher.proxyManger.getProxyIP_HTTP(),
                                     HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
 
-                return self.get_html(url, count + 1, useProxy, data, returnType)
+                return self.get_html(url, count + 1, useProxy, data, returnType, printInfo)
 
             if response.status_code is not 200:
-                print("请求完毕，但响应不正常， 响应码为：" + str(response.status_code))
+                if printInfo:
+                    print("请求完毕，但响应不正常， 响应码为：" + str(response.status_code))
                 if useProxy:
                     self.__setProxy(HTML_Fetcher.proxyManger.getProxyIP_HTTP(),
                                     HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
 
-                return self.get_html(url, count + 1, useProxy, data, returnType)
+                return self.get_html(url, count + 1, useProxy, data, returnType, printInfo)
 
             else:
                 return response.text if returnType == 'text' else response.content
 
         else:
-            # POST请求，暂时用不到
+            # POST请求，未测试
             assert self.request_type == 'POST'
             assert data is not None
-            response = requests.post(url, data=data, headers = self.headers)
-            return response.text if returnType == 'text' else response.content
+            try:
+                if not useProxy:
+                    response = requests.post(url, headers = self.headers, data = data)
+                else:
+                    response = requests.post(url, headers = self.headers,
+                                            proxies = self.proxy,
+                                            timeout = HTML_Fetcher.request_timeout,
+                                            data = data)
+
+            except BaseException:
+                if printInfo:
+                    print("请求过程中，异常发生")
+                # 这里没有对异常情况作具体处理，只是直接换代理IP 重新请求 就完事昂
+                if useProxy:
+                    self.__setProxy(HTML_Fetcher.proxyManger.getProxyIP_HTTP(),
+                                    HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
+
+                return self.get_html(url, count + 1, useProxy, data, returnType, printInfo)
+
+            if response.status_code is not 200:
+                if printInfo:
+                    print("请求完毕，但响应不正常， 响应码为：" + str(response.status_code))
+                if useProxy:
+                    self.__setProxy(HTML_Fetcher.proxyManger.getProxyIP_HTTP(),
+                                    HTML_Fetcher.proxyManger.getProxyIP_HTTPS())
+
+                return self.get_html(url, count + 1, useProxy, data, returnType, printInfo)
+
+            else:
+                return response.text if returnType == 'text' else response.content
 
 

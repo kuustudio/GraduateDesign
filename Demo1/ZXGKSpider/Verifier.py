@@ -24,7 +24,7 @@ class ZXGKVerifier:
                                               password=CJY_PASSWORD,
                                               soft_id=CJY_SOFT_ID)
 
-    def __getVerifyPng(self, type = 1):
+    def __getVerifyPng(self, type = 1, useProxy = False):
         '''
         获取验证码
         :param type: type为1时，代表被执行人查询，type为2时，代表司法拍卖查询
@@ -34,7 +34,7 @@ class ZXGKVerifier:
         self.__verifierUrl = 'http://zxgk.court.gov.cn/zhzxgk/' if type == 1 \
             else 'http://zxgk.court.gov.cn/sfpm/'
 
-        txt = self.__html_fetcher.get_html(self.__verifierUrl, count = 1, useProxy = False)
+        txt = self.__html_fetcher.get_html(self.__verifierUrl, count = 1, useProxy = useProxy)
 
         pattern = 'captcha.do\?(.*?)"' if type == 1 else 'captchaSfpm.do\?(.*?)"'
 
@@ -54,8 +54,8 @@ class ZXGKVerifier:
         #     f.write(png)
         return png
 
-    def getVerifyInfo(self, type = 1):
-        png = self.__getVerifyPng(type = type)
+    def getVerifyInfo(self, type = 1, useProxy = False):
+        png = self.__getVerifyPng(type = type, useProxy = useProxy)
         response = self.__chaoJiYing.PostPic(png, IMG_TYPE_GETVALUE)
         verifyValue = response['pic_str']
         return self.__capchaId, self.__randomNum, verifyValue
