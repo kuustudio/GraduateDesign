@@ -7,7 +7,7 @@ connect = pymysql.Connect(
     port = remote_port,
     user = remote_user,
     passwd = remote_passwd,
-    #db = 'hzaee',
+    db = 'hzaee',
     charset = charset,
     cursorclass = pymysql.cursors.DictCursor
 )
