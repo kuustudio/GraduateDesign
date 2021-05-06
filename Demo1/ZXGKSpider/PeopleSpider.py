@@ -100,6 +100,8 @@ class PeopleSpider():
         if currentPage == 1:
             self.__form_data['pName'] = pName
             self.__form_data['pCardNum'] = pCardNum
+            if not exceptionFlag:
+                self.__dataFrame = pd.DataFrame(columns=self.__dataFrameColumns)
 
         if currentPage == 1 or exceptionFlag == True:
             (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1, False)
