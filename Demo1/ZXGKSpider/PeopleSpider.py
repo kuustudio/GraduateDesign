@@ -121,7 +121,9 @@ class PeopleSpider():
             except:
                 print('爬取过程中出现错误！[json & data & totalPageNum & result]')
                 if exceptionFlag:
+                    print('连续在此处出现错误，取消本次爬取！')
                     time.sleep(3)
+                    return False
                 return self.search(pName, pCardNum, currentPage, exceptionFlag = True, useProxy = useProxy)
         try:
             dataDict = json1[0]
@@ -172,6 +174,10 @@ class PeopleSpider():
     def infoSave2Csv(self, name):
         self.__dataFrame.to_csv(name + '.csv', encoding='utf-8-sig', index=False)
 
+    def deletePeopleInfo(self, pName):
+        if pName in self.__peopleInfos.keys():
+            del self.__peopleInfos[pName]
+
 if __name__ == '__main__':
     peopleSpider = PeopleSpider()
     #peopleSpider.search('谢建华')
@@ -190,6 +196,10 @@ if __name__ == '__main__':
                     hasFlag = True
                     break
         if not hasFlag:
-            peopleSpider.search(name, useProxy=True)
-            peopleSpider.infoSave2Csv(name)
+            succeed = peopleSpider.search(name, useProxy=True)
+            if succeed:
+                peopleSpider.infoSave2Csv(name)
+            else:
+                print('本次爬取', name, '中途出现问题，后续重新进行爬取')
+                peopleSpider.deletePeopleInfo(name)
 
