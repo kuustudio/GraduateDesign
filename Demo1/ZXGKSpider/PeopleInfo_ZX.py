@@ -14,7 +14,7 @@ class PeopleInfo():
         self.__useProxy = useProxy
 
         json1 = json.loads(infoDict['jsonObject'])
-        self.__caseCreateTime = json1['caseCreateTime']
+        self.__caseCreateTime = json1['caseCreateTime'] if infoDict['caseCreateTime'] is not None else None
 
         # print((self.__name, self.__caseCode, self.__caseCreateTime))
 
@@ -24,8 +24,11 @@ class PeopleInfo():
 
         if not self.__getDetailPage():
             print('获取新Item出现错误')
-            time.sleep(15)
+            time.sleep(5)
             raise SyntaxError
+
+    def isNameEqual(self, name):
+        return self.__name == name
 
     def __getDetailPage(self):
         self.__url = 'http://zxgk.court.gov.cn/zhzxgk/detailZhcx.do'

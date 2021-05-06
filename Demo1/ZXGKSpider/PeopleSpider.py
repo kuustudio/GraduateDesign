@@ -102,7 +102,7 @@ class PeopleSpider():
             self.__form_data['pCardNum'] = pCardNum
 
         if currentPage == 1 or exceptionFlag == True:
-            (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1, useProxy)
+            (captchaId, randomNum, pCode) = self.__verifier.getVerifyInfo(1, False)
             self.__form_data['captchaId'] = captchaId
             self.__form_data['pCode'] = pCode
         else:
@@ -120,6 +120,8 @@ class PeopleSpider():
                 json1 = json.loads(data)
             except:
                 print('爬取过程中出现错误！[json & data & totalPageNum & result]')
+                if exceptionFlag:
+                    time.sleep(3)
                 return self.search(pName, pCardNum, currentPage, exceptionFlag = True, useProxy = useProxy)
         try:
             dataDict = json1[0]
@@ -136,12 +138,24 @@ class PeopleSpider():
             assert currentPage == 1
             self.__peopleInfos[pName] = []
 
+        temp_list = []
+        isNotSame = False
         for each in result:
             try:
                 peopleInfo = PeopleInfo(each, captchaId, pCode, self.__html_fetcher, self.__dataFrame, useProxy = useProxy)
+                if not peopleInfo.isNameEqual(pName):
+                    print('截至当前页，姓名已经不相同，停止对该名称用户人的爬取。')
+                    isNotSame = True
+                    break
             except:
                 return self.search(pName, pCardNum, currentPage, exceptionFlag=True, useProxy=useProxy)
+            temp_list.append(peopleInfo)
+
+        for peopleInfo in temp_list:
             self.__peopleInfos[pName].append(peopleInfo)
+
+        if isNotSame:
+            return True
 
         if totalPageNum > 1:
             if currentPage == totalPageNum:
