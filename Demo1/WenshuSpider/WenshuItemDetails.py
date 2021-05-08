@@ -26,7 +26,7 @@ class WenshuItemDetails():
         }
 
         data = json.loads(
-            self.__htmlFetcher.get_html(self.__url, 1, useProxy=False, data=self.__data)
+            self.__htmlFetcher.get_html(self.__url, 1, useProxy=True, data=self.__data, printInfo=False)
         )
         try:
             key = data["secretKey"]

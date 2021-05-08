@@ -254,7 +254,7 @@ class WenshuSpider():
         self.__data['pageNum'] = str(currentPage)
 
         data = json.loads(
-            self.__htmlFetcher.get_html(self.__url, 1, useProxy=False, data=self.__data)
+            self.__htmlFetcher.get_html(self.__url, 1, useProxy=True, data=self.__data, printInfo=False)
         )
         try:
             key = data["secretKey"]
@@ -265,6 +265,7 @@ class WenshuSpider():
             assert data['success'] == False
             print('获取一级文书页面出现问题，Cookie需要更新')
             self.__hasLogIn = False
+            self.__htmlFetcher.refresh_proxy()
             self.__getWenshu(currentPage=currentPage)
             return
 
@@ -284,6 +285,7 @@ class WenshuSpider():
                 thisPageWenshuList.append(wenshuItem)
             except:
                 self.__hasLogIn = False
+                self.__htmlFetcher.refresh_proxy()
                 self.__getWenshu(currentPage=currentPage)
                 return
 
