@@ -3,11 +3,15 @@ from Demo1.config import *
 import execjs
 import json
 from Demo1.WenshuSpider.WenshuItemDetails import *
-
+from selenium import webdriver
+import time
 
 class WenshuSpider():
-    def __init__(self):
-        self.__cookie = Cookie_init_Wenshu
+    def __init__(self, username, password):
+        self.__username = username
+        self.__password = password
+
+        self.__cookie = ''
 
         self.__wenshu_headers = {
             'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -57,7 +61,14 @@ class WenshuSpider():
 
         self.__totalPageNum = 1
 
-    def logIn(self):
+        self.__hasLogIn = False
+
+    def __refreshCookie(self, newCookie):
+        self.__cookie = newCookie
+        self.__wenshu_headers['Cookie'] = newCookie
+        self.__htmlFetcher.setCookie(newCookie)
+
+    def __logIn_noWebdriver(self):
         authorizeHeaders = {
             'Accept': '*/*',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -102,8 +113,7 @@ class WenshuSpider():
         getBase64_params = {'appDomain': 'wenshu.court.gov.cn'}
         getBase64_response = session.get(getBase64_url, headers = getBase64_header, params = getBase64_params)
 
-        psw = 'Cai123456'
-        self.__encodePassword = self.__JSLoginEnv.call('encodePassword', psw)
+        self.__encodePassword = self.__JSLoginEnv.call('encodePassword', self.__password)
         logIn_headers = {
             'Accept': '*/*',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -125,7 +135,7 @@ class WenshuSpider():
         }
         logInUrl = 'https://account.court.gov.cn/api/login'
         logInData = {
-            'username': '18801353952',
+            'username': self.__username,
             'password': self.__encodePassword,
             'appDomain': 'wenshu.court.gov.cn'
         }
@@ -144,6 +154,37 @@ class WenshuSpider():
         self.__wenshu_headers['Cookie'] = self.__cookie
         self.__htmlFetcher.setCookie(self.__cookie)
 
+    def __logIn_Webdriver(self):
+        browser = webdriver.Chrome()
+        iframe_url = 'https://account.court.gov.cn/app?back_url=https%3A%2F%2Faccount.court.gov.cn%2Foauth%2Fauthorize%3Fresponse_type%3Dcode%26client_id%3Dzgcpwsw%26redirect_uri%3Dhttps%253A%252F%252Fwenshu.court.gov.cn%252FCallBackController%252FauthorizeCallBack%26state%3D1b1b7539-4023-47ec-bba7-defe7d38c2ae%26timestamp%3D1620445772894%26signature%3D83913547A97CFC0D1FD949B6141B1E94F8C97469D4508DDCD5E3C1678415BD7E%26scope%3Duserinfo#/login'
+        browser.get(iframe_url)
+        while True:
+            try:
+                username = browser.find_element_by_xpath('//*[@id="root"]/div/form/div[1]/div[1]/div/div/div/input')
+                psw = browser.find_element_by_xpath('//*[@id="root"]/div/form/div[1]/div[2]/div/div/div/input')
+                break
+            except:
+                time.sleep(0.5)
+
+        username.send_keys(self.__username)
+        psw.send_keys(self.__password)
+
+
+        button = browser.find_element_by_xpath('//*[@id="root"]/div/form/div[3]/span')
+        button.click()
+
+        while 'https://wenshu.court.gov.cn/' not in browser.current_url:
+            time.sleep(0.5)
+
+        login = browser.find_element_by_xpath('//*[@id="loginLi"]/a')
+        login.click()
+
+        time.sleep(0.5)
+        print(browser.get_cookies())
+        cookieSetter_new = CookieSetter(browser.get_cookies())
+        self.__refreshCookie(cookieSetter_new.strCookie)
+        print('Cookie更新为：', self.__cookie)
+        browser.close()
 
     def __dealItems(self, jsonData):
         resultList = jsonData['queryResult']['resultList']
@@ -158,7 +199,11 @@ class WenshuSpider():
                     1、刑事案件文书
         :return:
         '''
-        if currentPage == 1:
+        if not self.__hasLogIn:
+            self.__logIn_Webdriver()
+            self.__hasLogIn = True
+
+        if currentPage == 1 or (not self.__hasLogIn):
             self.__data['s8'] = '02'
             self.__data['queryCondition'] = '[{"key":"s8","value":"02"}]'
             self.__data['__RequestVerificationToken'] = self.__JSRunEnvironment.call('random', 24)
@@ -175,7 +220,10 @@ class WenshuSpider():
             realContent = self.__JSRunEnvironment.call('Decipher', result, key)
             realContentJson = json.loads(realContent)
         except:
-            print('Cookie需要更新')
+            print('获取一级文书页面出现问题，Cookie需要更新')
+            self.__hasLogIn = False
+            self.getWenshu(currentPage=currentPage, wenshuType=wenshuType)
+            return
 
         if currentPage == 1:
             itemsNum = realContentJson['queryResult']['resultCount']
@@ -189,6 +237,5 @@ class WenshuSpider():
             self.getWenshu(currentPage=currentPage + 1, wenshuType = wenshuType)
 
 if __name__ == '__main__':
-    wenshuSpider = WenshuSpider()
-    wenshuSpider.logIn()
+    wenshuSpider = WenshuSpider('18801353952', 'Cai123456')
     wenshuSpider.getWenshu()

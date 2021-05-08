@@ -523,36 +523,3 @@ Cookie_init_wx_list = [
 ]
 cookieSetter_wx = CookieSetter(Cookie_init_wx_list)
 Cookie_init_wx = cookieSetter_wx.strCookie
-
-# 裁判文书爬取Cookie
-Cookie_init_Wenshu_list = [
-{
-    "domain": ".court.gov.cn",
-    "expirationDate": 1636114182,
-    "hostOnly": False,
-    "httpOnly": False,
-    "name": "UM_distinctid",
-    "path": "/",
-    "sameSite": "unspecified",
-    "secure": False,
-    "session": False,
-    "storeId": "0",
-    "value": "17946bbca9092-08a4068b8d23cc-c3f3568-144000-17946bbca91375",
-    "id": 1
-},
-{
-    "domain": "wenshu.court.gov.cn",
-    "hostOnly": True,
-    "httpOnly": True,
-    "name": "SESSION",
-    "path": "/",
-    "sameSite": "unspecified",
-    "secure": False,
-    "session": True,
-    "storeId": "0",
-    "value": "5ea17c30-6cac-44f7-b228-e63a95c3c375",
-    "id": 2
-}
-]
-cookieSetter_wenshu = CookieSetter(Cookie_init_Wenshu_list)
-Cookie_init_Wenshu = cookieSetter_wenshu.strCookie

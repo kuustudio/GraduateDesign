@@ -36,7 +36,8 @@ class WenshuItemDetails():
             realContentJson = json.loads(realContent)
             print(realContentJson)
         except:
-            print('Cookie需要更新')
+            print('获取文书详细信息出现问题，Cookie需要更新')
+            raise
 
         try:
             self.__publicizeDate = realContentJson['s41']
