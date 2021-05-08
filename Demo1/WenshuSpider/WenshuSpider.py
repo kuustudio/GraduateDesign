@@ -6,6 +6,7 @@ from Demo1.WenshuSpider.WenshuItemDetails import *
 from selenium import webdriver
 import time
 from Demo1.WenshuSpider.SearchList import *
+import math
 
 class WenshuSpider():
     def __init__(self, username, password):
@@ -190,12 +191,6 @@ class WenshuSpider():
         print('Cookie更新为：', self.__cookie)
         browser.close()
 
-    def __dealItems(self, jsonData):
-        resultList = jsonData['queryResult']['resultList']
-        for item in resultList:
-            wenshuItem = WenshuItemDetails(item, self.__htmlFetcher, self.__JSRunEnvironment)
-            self.__wenshuList.append(wenshuItem)
-
     def __setWenshuType(self, wenshuType = '民事案件'):
         self.__queryCondition = []
         typeCode = dict_type[wenshuType]["value"]
@@ -247,11 +242,12 @@ class WenshuSpider():
         if not self.__hasLogIn:
             self.__logIn_Webdriver()
             self.__hasLogIn = True
+            if currentPage != 1:
+                self.__data['__RequestVerificationToken'] = self.__JSRunEnvironment.call('random', 24)
+                self.__data['ciphertext'] = self.__JSRunEnvironment.call('getCipher')
 
         if currentPage == 1:
             self.__data['queryCondition'] = str(self.__queryCondition)
-
-        if currentPage == 1 or (not self.__hasLogIn):
             self.__data['__RequestVerificationToken'] = self.__JSRunEnvironment.call('random', 24)
             self.__data['ciphertext'] = self.__JSRunEnvironment.call('getCipher')
 
@@ -277,10 +273,22 @@ class WenshuSpider():
             if itemsNum == 0:
                 print('本条件下没有文书！结束本次搜索')
                 return
-            self.__totalPageNum = 600 if itemsNum >= 600 else itemsNum
-            print('总文书数量：', str(self.__totalPageNum))
+            self.__totalPageNum = 120 if itemsNum >= 600 else math.ceil(itemsNum / 5)
+            print('总文书数量：', itemsNum, '总页数：', str(self.__totalPageNum))
 
-        self.__dealItems(realContentJson)
+        resultList = realContentJson['queryResult']['resultList']
+        thisPageWenshuList = []
+        for item in resultList:
+            try:
+                wenshuItem = WenshuItemDetails(item, self.__htmlFetcher, self.__JSRunEnvironment)
+                thisPageWenshuList.append(wenshuItem)
+            except:
+                self.__hasLogIn = False
+                self.__getWenshu(currentPage=currentPage)
+                return
+
+        for wenshu in thisPageWenshuList:
+            self.__wenshuList.append(wenshu)
 
         if currentPage == self.__totalPageNum:
             return

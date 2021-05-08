@@ -37,7 +37,7 @@ class WenshuItemDetails():
             print(realContentJson)
         except:
             print('获取文书详细信息出现问题，Cookie需要更新')
-            raise
+            raise SyntaxError
 
         try:
             self.__publicizeDate = realContentJson['s41']
