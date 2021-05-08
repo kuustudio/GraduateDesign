@@ -5,6 +5,7 @@ import json
 from Demo1.WenshuSpider.WenshuItemDetails import *
 from selenium import webdriver
 import time
+from Demo1.WenshuSpider.SearchList import *
 
 class WenshuSpider():
     def __init__(self, username, password):
@@ -35,13 +36,16 @@ class WenshuSpider():
         self.__htmlFetcher = HTML_Fetcher('中国裁判文书网',
                                           headers = self.__wenshu_headers,
                                           request_type = 'POST')
+
+        self.__queryCondition = [{"key":"s8","value":"02"}]
+
         self.__data = {
             #'pageId': 'c2c0bdb832a4221d3548cdc366f9812b',
             's8': '02',
             'sortFields': 's50:desc',
             'ciphertext': '1010111 1001101 1111000 1000100 1100111 1100010 1000110 110111 1111010 1100111 1101000 1100101 1000010 1010010 1110100 1110010 1100111 1101001 1100101 1110100 1000100 1001011 1010000 1001111 110010 110000 110010 110001 110000 110101 110000 110110 1001100 101011 1111000 1001111 1001100 1000011 111000 1111001 1100101 1010110 1110011 1010011 1001101 1100100 110101 1110110 1000011 110110 1110110 1001100 1010110 1000001 111101 111101',
             'pageNum': '1',
-            'queryCondition': '[{"key":"s8","value":"02"}]',
+            'queryCondition': str(self.__queryCondition),
             'cfg': 'com.lawyee.judge.dc.parse.dto.SearchDataDsoDTO@queryDoc',
             '__RequestVerificationToken': 'lBfMrxn52pklQddl7nsYqu5m'
         }
@@ -170,7 +174,7 @@ class WenshuSpider():
         psw.send_keys(self.__password)
 
 
-        button = browser.find_element_by_xpath('//*[@id="root"]/div/form/div[3]/span')
+        button = browser.find_element_by_xpath('//*[@id="root"]/div/form/div/div[3]/span')
         button.click()
 
         while 'https://wenshu.court.gov.cn/' not in browser.current_url:
@@ -192,20 +196,62 @@ class WenshuSpider():
             wenshuItem = WenshuItemDetails(item, self.__htmlFetcher, self.__JSRunEnvironment)
             self.__wenshuList.append(wenshuItem)
 
-    def getWenshu(self, currentPage = 1, wenshuType = 1):
+    def __setWenshuType(self, wenshuType = '民事案件'):
+        self.__queryCondition = []
+        typeCode = dict_type[wenshuType]["value"]
+
+        self.__data['s8'] = typeCode
+
+        self.__queryCondition.append(dict_type[wenshuType])
+
+    def __setCourtLevel(self, courtLevel = '高级法院'):
+        self.__queryCondition.append(dict_court[courtLevel])
+
+    def __setYear(self, year = 2021):
+        assert 2000 <= year <= 2021
+        dict_year = {"key" : key_year, "value" : str(year)}
+        self.__queryCondition.append(dict_year)
+
+    def __setArea(self, area):
+        for dict in list_area:
+            if dict['value'] == area:
+                self.__queryCondition.append(dict)
+                break
+
+    def findWholeWenshu(self):
+        for type in dict_type.keys():
+            self.__setWenshuType(type)
+            for court in dict_court.keys():
+                self.__setCourtLevel(courtLevel=court)
+                for year in range(2000, 2022):
+                    self.__setYear(year)
+                    if court == '最高法院':
+                        print(self.__queryCondition)
+                        self.__getWenshu()
+                    else:
+                        for area in list_area:
+                            self.__setArea(area["value"])
+                            print(self.__queryCondition)
+                            self.__getWenshu()
+                            del self.__queryCondition[-1]
+                    del self.__queryCondition[-1]
+                del self.__queryCondition[-1]
+            del self.__queryCondition[-1]
+
+
+    def __getWenshu(self, currentPage = 1):
         '''
         :param currentPage: 当前页面
-        :param wenshuType:  文书类型
-                    1、刑事案件文书
         :return:
         '''
         if not self.__hasLogIn:
             self.__logIn_Webdriver()
             self.__hasLogIn = True
 
+        if currentPage == 1:
+            self.__data['queryCondition'] = str(self.__queryCondition)
+
         if currentPage == 1 or (not self.__hasLogIn):
-            self.__data['s8'] = '02'
-            self.__data['queryCondition'] = '[{"key":"s8","value":"02"}]'
             self.__data['__RequestVerificationToken'] = self.__JSRunEnvironment.call('random', 24)
             self.__data['ciphertext'] = self.__JSRunEnvironment.call('getCipher')
 
@@ -220,22 +266,27 @@ class WenshuSpider():
             realContent = self.__JSRunEnvironment.call('Decipher', result, key)
             realContentJson = json.loads(realContent)
         except:
+            assert data['success'] == False
             print('获取一级文书页面出现问题，Cookie需要更新')
             self.__hasLogIn = False
-            self.getWenshu(currentPage=currentPage, wenshuType=wenshuType)
+            self.__getWenshu(currentPage=currentPage)
             return
 
         if currentPage == 1:
             itemsNum = realContentJson['queryResult']['resultCount']
+            if itemsNum == 0:
+                print('本条件下没有文书！结束本次搜索')
+                return
             self.__totalPageNum = 600 if itemsNum >= 600 else itemsNum
+            print('总文书数量：', str(self.__totalPageNum))
 
         self.__dealItems(realContentJson)
 
         if currentPage == self.__totalPageNum:
             return
         else:
-            self.getWenshu(currentPage=currentPage + 1, wenshuType = wenshuType)
+            self.__getWenshu(currentPage=currentPage + 1)
 
 if __name__ == '__main__':
     wenshuSpider = WenshuSpider('18801353952', 'Cai123456')
-    wenshuSpider.getWenshu()
+    wenshuSpider.findWholeWenshu()
