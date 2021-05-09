@@ -2,36 +2,7 @@ import pymysql
 from Demo1.MySQL_EXEC_TYC.config import *
 import time
 
-connect = pymysql.Connect(
-    host = remote_host,
-    port = remote_port,
-    user = remote_user,
-    passwd = remote_passwd,
-    db = 'hzaee',
-    charset = charset,
-    cursorclass = pymysql.cursors.DictCursor
-)
-
-cursor = connect.cursor()
-
-def createDatabase(name):
-    global connect
-    global cursor
-    cursor.execute('create database if not exists ' + name)
-    connect.commit()
-
-    connect = pymysql.Connect(
-        host = remote_host,
-        port = remote_port,
-        user = remote_user,
-        passwd = remote_passwd,
-        db = 'hzaee',
-        charset = charset,
-        cursorclass = pymysql.cursors.DictCursor
-    )
-    cursor = connect.cursor()
-
-def createHzaeeTable():
+def createHzaeeTable(connect, cursor):
     sql = '''
     create table Hzaee (
         createDate text(100) comment '信息披露创建时间',
@@ -179,6 +150,45 @@ def createHzaeeTable():
     '''
     cursor.execute(sql)
     connect.commit()
+
+def createDatabase(name):
+    preConnect = pymysql.Connect(
+        host = host,
+        port = port,
+        user = user,
+        passwd = passwd,
+        charset = charset,
+    )
+    preCursor = preConnect.cursor()
+
+    preCursor.execute('create database if not exists ' + name)
+    preConnect.commit()
+
+    newConnect = pymysql.Connect(
+        host=host,
+        port=port,
+        user=user,
+        passwd=passwd,
+        db=name,
+        charset=charset,
+    )
+    newCursor = newConnect.cursor()
+
+    createHzaeeTable(newConnect, newCursor)
+
+    return name
+
+connect = pymysql.Connect(
+    host = host,
+    port = port,
+    user = user,
+    passwd = passwd,
+    db = createDatabase('hzaee'),
+    charset = charset,
+    cursorclass = pymysql.cursors.DictCursor
+)
+
+cursor = connect.cursor()
 
 def excute(sql, data):
     data_list = list(data)

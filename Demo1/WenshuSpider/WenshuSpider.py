@@ -281,7 +281,7 @@ class WenshuSpider():
         thisPageWenshuList = []
         for item in resultList:
             try:
-                wenshuItem = WenshuItemDetails(item, self.__htmlFetcher, self.__JSRunEnvironment)
+                wenshuItem = WenshuItemDetails(item, self.__htmlFetcher, self.__JSRunEnvironment, self.__queryCondition)
                 thisPageWenshuList.append(wenshuItem)
             except:
                 self.__hasLogIn = False
