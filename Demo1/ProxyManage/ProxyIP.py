@@ -17,8 +17,16 @@ class ProxyIP():
         self.request_time = request_time
         self.deathTime = request_time + liveTime
 
+        self.useTime = 1
+
+    def addUseTime(self):
+        self.useTime += 1
+
     def hasDead(self):
         if time.time() >= self.deathTime:
+            return True
+        if self.useTime > 3:
+            print('\t本IP：', self.address, '已经重复失效4次，判定为失效！')
             return True
         return False
 

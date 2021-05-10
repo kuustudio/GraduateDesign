@@ -83,6 +83,7 @@ class ProxyManagerZhima():
                 else:
                     for proxy in self.proxies_http:
                         if not proxy.__eq__(self.nowProxy_http):
+                            proxy.addUseTime()
                             self.nowProxy_http = proxy
                             break
                     return self.nowProxy_http.address
@@ -135,6 +136,7 @@ class ProxyManagerZhima():
                 else:
                     for proxy in self.proxies_https:
                         if not proxy.__eq__(self.nowProxy_https):
+                            proxy.addUseTime()
                             self.nowProxy_https = proxy
                             break
                     #print('更换代理IP为 : ' + self.nowProxy_https.address)
